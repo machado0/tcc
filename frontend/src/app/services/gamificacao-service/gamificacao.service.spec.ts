@@ -1,98 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting
-} from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { GamificacaoService } from './gamificacao.service';
-import { DadosHome, TurmaRanking } from '../../models/models';
-
-const home = {
-  usuario: { id: 1, nome: 'Aluno' },
-  estatisticas: {
-    nivel: 1,
-    xpAtual: 0,
-    xpProximoNivel: 250,
-    xpHoje: 0,
-    sequenciaDias: 1,
-    melhorSequenciaDias: 1,
-    moedas: 0,
-    vidas: 3
-  },
-  metricas: {
-    questoesRespondidas: 0,
-    questoesCorretas: 0,
-    aulasConcluidas: 0,
-    tempoTotalEstudoMinutos: 0,
-    taxaAcerto: 0
-  },
-  continuarEstudando: null,
-  missoesDiarias: [
-    {
-      id: 1,
-      titulo: 'Concluir uma aula',
-      xp: 20,
-      concluida: false,
-      tipo: 'CONCLUIR_AULAS' as const,
-      meta: 1,
-      progressoAtual: 0,
-      dataReferencia: '2026-10-28'
-    }
-  ],
-  conquistas: [
-    {
-      id: 1,
-      titulo: 'Primeira aula',
-      descricao: 'Conclua uma aula',
-      icone: 'school',
-      desbloqueada: false,
-      progressoAtual: 0,
-      meta: 1,
-      recompensaXp: 10,
-      categoria: 'GERAL' as const
-    }
-  ],
-  progressoSemanal: {
-    dias: [],
-    totalXp: 0,
-    diasEstudados: 0
-  }
-} as DadosHome;
-
-const ranking = {
-  id: 1,
-  nomeTurma: '3A',
-  periodo: 'Semana atual',
-  terminaEmDias: 3,
-  totalAlunos: 1,
-  posicaoUsuarioLogado: 1,
-  alunos: [
-    {
-      posicao: 1,
-      usuarioId: 1,
-      nome: 'Aluno',
-      username: '@aluno',
-      nivel: 1,
-      xpSemana: 0,
-      sequenciaDias: 1,
-      tendencia: 'MANTEVE' as const,
-      ehUsuarioLogado: true
-    }
-  ]
-} as TurmaRanking;
 
 describe('GamificacaoService', () => {
   let service: GamificacaoService;
   let http: HttpTestingController;
 
   beforeEach(() => {
-    localStorage.clear();
     TestBed.configureTestingModule({
-      providers: [
-        GamificacaoService,
-        provideHttpClient(),
-        provideHttpClientTesting()
-      ]
+      providers: [GamificacaoService, provideHttpClient(), provideHttpClientTesting()]
     });
     service = TestBed.inject(GamificacaoService);
     http = TestBed.inject(HttpTestingController);
@@ -100,37 +17,37 @@ describe('GamificacaoService', () => {
 
   afterEach(() => http.verify());
 
-  it('inicializa o snapshot com os mocks', () => {
+  it('carrega o estado pelos endpoints reais', () => {
     service.carregar().subscribe(estado => {
-      expect(estado.usuarioId).toBe(1);
-      expect(estado.missoes.length).toBe(1);
+      expect(estado.estatisticas.nivel).toBe(2);
+      expect(estado.conquistas.length).toBe(1);
+      expect(estado.conquistas[0].recompensaXp).toBe(50);
     });
-
-    http.expectOne('assets/data/mock_usuario.json').flush(home);
-    http.expectOne('assets/data/mock_ranking.json').flush(ranking);
+    http.expectOne('/api/v1/alunos/dashboard').flush({
+      level: 2, currentXp: 100, nextLevelXp: 250, xpToday: 20,
+      streak: 3, bestStreak: 5, coins: 10, lives: 3, posicaoRanking: 1,
+      questoesRespondidas: 5, questoesCorretas: 4, aulasConcluidas: 1,
+      tempoTotalEstudoMinutos: 12,
+      missoesDiarias: [],
+      progressoSemanal: { dias: [], totalXp: 20, diasEstudados: 1 }
+    });
+    http.expectOne('/api/v1/ranking').flush({
+      turmaId: 1, turmaNome: '3A',
+      alunos: [{ posicao: 1, usuarioId: 1, nome: 'Aluno', xp: 100, nivel: 2, streak: 3 }],
+      meuPerfil: { posicao: 1, usuarioId: 1 }
+    });
+    http.expectOne('/api/v1/conquistas').flush([{
+      id: 1, titulo: 'Primeira', descricao: 'Teste', icone: 'school',
+      meta: 1, recompensaXp: 50, progressoAtual: 1, desbloqueada: true
+    }]);
   });
 
-  it('atualiza missão, conquista, XP e não duplica a conclusão', () => {
-    service.carregar().subscribe();
-    http.expectOne('assets/data/mock_usuario.json').flush(home);
-    http.expectOne('assets/data/mock_ranking.json').flush(ranking);
-
-    const conclusao = {
-      aulaId: 1008,
-      acertos: 1,
-      total: 1,
-      xpTotal: 5
-    };
-
-    service.registrarConclusao(conclusao).subscribe(resultado => {
-      expect(resultado.missoesAtualizadas[0].concluida).toBe(true);
-      expect(resultado.conquistasDesbloqueadas.length).toBe(1);
-      expect(resultado.estado.estatisticas.xpAtual).toBe(35);
-    });
-
-    service.registrarConclusao(conclusao).subscribe(resultado => {
-      expect(resultado.estado.estatisticas.xpAtual).toBe(35);
-      expect(resultado.conquistasDesbloqueadas.length).toBe(0);
+  it('submete respostas ao backend', () => {
+    service.submeterDesafio(10, 20).subscribe(resposta => expect(resposta.acertou).toBe(true));
+    http.expectOne('/api/v1/desafios/submeter').flush({
+      acertou: true, alternativaCorretaId: 20, xpGanho: 10,
+      moedasGanha: 1, vidasRestantes: 3, novoXpTotal: 110, novoNivel: 2,
+      conquistasDesbloqueadas: []
     });
   });
 });

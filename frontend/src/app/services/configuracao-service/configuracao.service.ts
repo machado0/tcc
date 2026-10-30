@@ -1,6 +1,6 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, of, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { ConfiguracoesUsuario } from '../../models/models';
 
 @Injectable({
@@ -8,35 +8,30 @@ import { ConfiguracoesUsuario } from '../../models/models';
 })
 export class ConfiguracaoService {
   private readonly http = inject(HttpClient);
-  private readonly chave = 'tcc_configuracoes_usuario';
+  private readonly configuracoesAtuais = signal<ConfiguracoesUsuario | null>(null);
+
+  readonly configuracoes = this.configuracoesAtuais.asReadonly();
 
   aplicarConfiguracaoSalva(): void {
-    const dadosSalvos = localStorage.getItem(this.chave);
-
-    if (!dadosSalvos) {
-      return;
-    }
-
-    try {
-      this.aplicarConfiguracoes(JSON.parse(dadosSalvos) as ConfiguracoesUsuario);
-    } catch {
-      localStorage.removeItem(this.chave);
+    if (localStorage.getItem('tcc_token')) {
+      this.obterConfiguracoes().subscribe();
     }
   }
 
   obterConfiguracoes(): Observable<ConfiguracoesUsuario> {
-    return this.http
-      .get<ConfiguracoesUsuario>('assets/data/mock_configuracoes.json')
-      .pipe(
-        map(configuracoes => this.obterConfiguracaoSalva(configuracoes)),
-        tap(configuracoes => this.aplicarConfiguracoes(configuracoes))
-      );
+    return this.http.get<ConfiguracoesUsuario>('/api/v1/configuracoes')
+      .pipe(tap(configuracoes => {
+        this.configuracoesAtuais.set(configuracoes);
+        this.aplicarConfiguracoes(configuracoes);
+      }));
   }
 
   salvarConfiguracoes(configuracoes: ConfiguracoesUsuario): Observable<ConfiguracoesUsuario> {
-    localStorage.setItem(this.chave, JSON.stringify(configuracoes));
-    this.aplicarConfiguracoes(configuracoes);
-    return of(configuracoes);
+    return this.http.put<ConfiguracoesUsuario>('/api/v1/configuracoes', configuracoes)
+      .pipe(tap(resposta => {
+        this.configuracoesAtuais.set(resposta);
+        this.aplicarConfiguracoes(resposta);
+      }));
   }
 
   aplicarConfiguracoes(configuracoes: ConfiguracoesUsuario): void {
@@ -51,21 +46,4 @@ export class ConfiguracaoService {
     elemento.classList.toggle('reduce-motion', !configuracoes.animacoesGamificacao);
   }
 
-  private obterConfiguracaoSalva(
-    configuracoesPadrao: ConfiguracoesUsuario
-  ): ConfiguracoesUsuario {
-    const dadosSalvos = localStorage.getItem(this.chave);
-
-    if (!dadosSalvos) {
-      return configuracoesPadrao;
-    }
-
-    try {
-      return JSON.parse(dadosSalvos) as ConfiguracoesUsuario;
-    } catch {
-      localStorage.removeItem(this.chave);
-      return configuracoesPadrao;
-    }
-  }
 }
-

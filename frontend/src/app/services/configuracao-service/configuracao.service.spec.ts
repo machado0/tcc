@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController } from '@angular/common/http/testing';
 import { ConfiguracaoService } from './configuracao.service';
 import { ConfiguracoesUsuario } from '../../models/models';
 
@@ -21,9 +22,9 @@ const configuracoes: ConfiguracoesUsuario = {
 
 describe('ConfiguracaoService', () => {
   let service: ConfiguracaoService;
+  let http: HttpTestingController;
 
   beforeEach(() => {
-    localStorage.clear();
     document.documentElement.className = '';
     TestBed.configureTestingModule({
       providers: [
@@ -33,6 +34,7 @@ describe('ConfiguracaoService', () => {
       ]
     });
     service = TestBed.inject(ConfiguracaoService);
+    http = TestBed.inject(HttpTestingController);
   });
 
   it('aplica tema, contraste, fonte e movimento no documento', () => {
@@ -44,11 +46,13 @@ describe('ConfiguracaoService', () => {
     expect(document.documentElement.classList.contains('reduce-motion')).toBe(true);
   });
 
-  it('persiste configuracoes e aplica seus efeitos', () => {
+  it('salva configuracoes pela API e aplica seus efeitos', () => {
     service.salvarConfiguracoes(configuracoes).subscribe(resultado => {
       expect(resultado).toEqual(configuracoes);
-      expect(localStorage.getItem('tcc_configuracoes_usuario')).toContain('escuro');
       expect(document.documentElement.classList.contains('dark')).toBe(true);
     });
+    const request = http.expectOne('/api/v1/configuracoes');
+    expect(request.request.method).toBe('PUT');
+    request.flush(configuracoes);
   });
 });

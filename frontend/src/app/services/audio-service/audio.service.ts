@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { ConfiguracaoService } from '../configuracao-service/configuracao.service';
 
 export type TipoFeedbackAudio = 'acerto' | 'erro' | 'conquista';
 
@@ -6,7 +7,7 @@ export type TipoFeedbackAudio = 'acerto' | 'erro' | 'conquista';
   providedIn: 'root'
 })
 export class AudioService {
-  private readonly chaveConfiguracoes = 'tcc_configuracoes_usuario';
+  private readonly configuracaoService = inject(ConfiguracaoService);
 
   tocar(tipo: TipoFeedbackAudio): void {
     if (!this.sonsAtivos()) {
@@ -38,16 +39,6 @@ export class AudioService {
   }
 
   private sonsAtivos(): boolean {
-    const dados = localStorage.getItem(this.chaveConfiguracoes);
-
-    if (!dados) {
-      return true;
-    }
-
-    try {
-      return (JSON.parse(dados) as { efeitosSonoros?: boolean }).efeitosSonoros !== false;
-    } catch {
-      return true;
-    }
+    return this.configuracaoService.configuracoes()?.efeitosSonoros !== false;
   }
 }

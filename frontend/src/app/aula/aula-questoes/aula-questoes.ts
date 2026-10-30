@@ -3,6 +3,7 @@ import { QuestaoAula, OpcaoQuestao } from '../../models/models';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { AudioService } from '../../services/audio-service/audio.service';
+import { GamificacaoService } from '../../services/gamificacao-service/gamificacao.service';
 
 @Component({
   selector: 'app-aula-questoes',
@@ -12,12 +13,14 @@ import { AudioService } from '../../services/audio-service/audio.service';
 })
 export class AulaQuestoes {
   private readonly audioService = inject(AudioService);
+  private readonly gamificacaoService = inject(GamificacaoService);
   questoes = input.required<QuestaoAula[]>();
   aulaConcluida = output<{ acertos: number; total: number; xpTotal: number }>();
 
   indiceAtual = signal(0);
   opcaoSelecionadaId = signal<number | null>(null);
   respostaConfirmada = signal(false);
+  enviandoResposta = signal(false);
   acertos = signal(0);
   sessaoFinalizada = signal(false);
   respostasHistorico = signal<{ questaoId: number; correta: boolean; xp: number }[]>([]);
@@ -48,20 +51,22 @@ export class AulaQuestoes {
     const q = this.questaoAtual();
     if (!q || this.opcaoSelecionadaId() === null || this.respostaConfirmada()) return;
 
-    const correta = this.opcaoSelecionadaId() === q.opcaoCorretaId;
-    const xp = correta ? q.xpRecompensa : 0;
-    this.audioService.tocar(correta ? 'acerto' : 'erro');
-
-    if (correta) {
-      this.acertos.update((v) => v + 1);
-    }
-
-    this.respostasHistorico.update((lista) => [
-      ...lista,
-      { questaoId: q.id, correta, xp }
-    ]);
-
-    this.respostaConfirmada.set(true);
+    const alternativaId = this.opcaoSelecionadaId();
+    if (alternativaId === null) return;
+    this.enviandoResposta.set(true);
+    this.gamificacaoService.submeterDesafio(q.id, alternativaId).subscribe({
+      next: feedback => {
+        this.audioService.tocar(feedback.acertou ? 'acerto' : 'erro');
+        if (feedback.acertou) this.acertos.update(v => v + 1);
+        this.respostasHistorico.update(lista => [
+          ...lista,
+          { questaoId: q.id, correta: feedback.acertou, xp: feedback.xpGanho }
+        ]);
+        this.respostaConfirmada.set(true);
+        this.enviandoResposta.set(false);
+      },
+      error: () => this.enviandoResposta.set(false)
+    });
   }
 
   avancar(): void {
@@ -88,4 +93,3 @@ export class AulaQuestoes {
     this.respostasHistorico.set([]);
   }
 }
-

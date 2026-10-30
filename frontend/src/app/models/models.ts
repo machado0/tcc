@@ -101,6 +101,15 @@ export interface ProgressoSemanal {
   diasEstudados: number;
 }
 
+export interface SessaoEstudo {
+  id: number;
+  aulaId?: number;
+  inicio: string;
+  fim?: string;
+  duracaoMinutos?: number;
+  concluida: boolean;
+}
+
 export interface DadosHome {
   usuario: Usuario;
   estatisticas: EstatisticasUsuario;
@@ -205,9 +214,26 @@ export interface QuestaoAula {
   enunciado: string;
   contextoEscolar?: string;
   opcoes: OpcaoQuestao[];
-  opcaoCorretaId: number;
-  explicacaoPedagogica: string;
+  opcaoCorretaId?: number;
+  explicacaoPedagogica?: string;
   xpRecompensa: number;
+}
+
+export interface FeedbackDesafio {
+  acertou: boolean;
+  alternativaCorretaId: number;
+  justificativa?: string;
+  xpGanho: number;
+  moedasGanha: number;
+  vidasRestantes: number;
+  novoXpTotal: number;
+  novoNivel: number;
+  conquistasDesbloqueadas: Array<{
+    id: number;
+    titulo: string;
+    descricao: string;
+    xpRecompensa: number;
+  }>;
 }
 
 export interface ConteudoTeorico {

@@ -1,337 +1,161 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, map, of, tap } from 'rxjs';
+import { Observable, forkJoin, map, tap } from 'rxjs';
 import {
-  AlunoRanking,
-  Conquista,
-  ConclusaoAula,
-  DadosHome,
-  EstatisticasUsuario,
-  GamificacaoEstado,
-  MetricasDesempenho,
-  Missao,
-  MissaoEstado,
-  ResultadoGamificacao,
-  TipoMissao,
-  TurmaRanking
+  FeedbackDesafio, GamificacaoEstado, TurmaRanking, EstatisticasUsuario, MetricasDesempenho
 } from '../../models/models';
 
-@Injectable({
-  providedIn: 'root'
-})
+interface DashboardResponse {
+  level: number;
+  currentXp: number;
+  nextLevelXp: number;
+  xpToday: number;
+  streak: number;
+  bestStreak: number;
+  coins: number;
+  lives: number;
+  posicaoRanking: number;
+  questoesRespondidas: number;
+  questoesCorretas: number;
+  aulasConcluidas: number;
+  tempoTotalEstudoMinutos: number;
+  missoesDiarias: BackendMissao[];
+  progressoSemanal: BackendProgressoSemanal;
+}
+
+@Injectable({ providedIn: 'root' })
 export class GamificacaoService {
   private readonly http = inject(HttpClient);
-  private readonly chave = 'tcc_gamificacao_estado';
   private readonly estadoInterno = signal<GamificacaoEstado | null>(null);
-
   readonly estado = this.estadoInterno.asReadonly();
 
   carregar(): Observable<GamificacaoEstado> {
-    const salvo = this.obterEstadoSalvo();
-
-    if (salvo) {
-      this.estadoInterno.set(salvo);
-      return of(salvo);
-    }
-
     return forkJoin({
-      home: this.http.get<DadosHome>('assets/data/mock_usuario.json'),
-      ranking: this.http.get<TurmaRanking>('assets/data/mock_ranking.json')
+      dashboard: this.http.get<DashboardResponse>('/api/v1/alunos/dashboard'),
+      ranking: this.http.get<BackendRanking>('/api/v1/ranking'),
+      conquistas: this.http.get<BackendConquista[]>('/api/v1/conquistas')
     }).pipe(
-      map(({ home, ranking }) => this.criarEstadoInicial(home, ranking)),
-      tap(estado => this.persistir(estado))
+      map(({ dashboard, ranking, conquistas }) => this.mapearEstado(dashboard, this.mapearRanking(ranking), conquistas)),
+      tap(estado => this.estadoInterno.set(estado))
     );
   }
 
-  registrarConclusao(
-    conclusao: Omit<ConclusaoAula, 'dataConclusao'>
-  ): Observable<ResultadoGamificacao> {
-    return this.carregar().pipe(
-      map(estado => this.aplicarConclusao(estado, {
-        ...conclusao,
-        dataConclusao: new Date().toISOString()
-      })),
-      tap(resultado => this.persistir(resultado.estado))
-    );
+  submeterDesafio(questaoId: number, alternativaEscolhidaId: number): Observable<FeedbackDesafio> {
+    return this.http.post<FeedbackDesafio>('/api/v1/desafios/submeter', {
+      questaoId,
+      alternativaEscolhidaId
+    });
   }
 
-  private criarEstadoInicial(
-    home: DadosHome,
-    ranking: TurmaRanking
+  private mapearEstado(
+    dashboard: DashboardResponse,
+    ranking: TurmaRanking,
+    conquistasApi: BackendConquista[]
   ): GamificacaoEstado {
-    const usuarioRanking = ranking.alunos.find(aluno => aluno.ehUsuarioLogado) ?? null;
-
-    return {
-      usuarioId: home.usuario.id,
-      atualizadoEm: new Date().toISOString(),
-      estatisticas: home.estatisticas,
-      metricas: home.metricas ?? {
-        questoesRespondidas: 0,
-        questoesCorretas: 0,
-        aulasConcluidas: 0,
-        tempoTotalEstudoMinutos: 0,
-        taxaAcerto: 0
-      },
-      missoes: home.missoesDiarias.map(missao => this.criarMissaoEstado(missao)),
-      conquistas: home.conquistas ?? [],
-      progressoSemanal: home.progressoSemanal,
-      conclusoes: [],
-      rankingUsuario: usuarioRanking
+    const estatisticas: EstatisticasUsuario = {
+      nivel: dashboard.level,
+      xpAtual: dashboard.currentXp,
+      xpProximoNivel: dashboard.nextLevelXp,
+      xpHoje: dashboard.xpToday,
+      sequenciaDias: dashboard.streak,
+      melhorSequenciaDias: dashboard.bestStreak,
+      moedas: dashboard.coins,
+      vidas: dashboard.lives
     };
-  }
-
-  private criarMissaoEstado(missao: Missao): MissaoEstado {
-    const tipo = this.obterTipoMissao(missao);
-    const metaInformada = (missao as Partial<MissaoEstado>).meta;
-    const numeroNoTitulo = missao.titulo.match(/\d+/)?.[0];
-    const meta = metaInformada && metaInformada > 0
-      ? metaInformada
-      : numeroNoTitulo
-        ? Number(numeroNoTitulo)
-        : 1;
-
-    return {
-      ...missao,
-      tipo,
-      meta,
-      progressoAtual: missao.concluida ? meta : 0,
-      dataReferencia: this.obterDataAtual()
+    const metricas: MetricasDesempenho = {
+      questoesRespondidas: dashboard.questoesRespondidas,
+      questoesCorretas: dashboard.questoesCorretas,
+      aulasConcluidas: dashboard.aulasConcluidas,
+      tempoTotalEstudoMinutos: dashboard.tempoTotalEstudoMinutos,
+      taxaAcerto: dashboard.questoesRespondidas
+        ? Math.round(dashboard.questoesCorretas / dashboard.questoesRespondidas * 100)
+        : 0
     };
-  }
-
-  private obterTipoMissao(missao: Missao): TipoMissao {
-    if (missao.titulo.toLowerCase().includes('quest')) {
-      return 'RESPONDER_QUESTOES';
-    }
-
-    if (missao.titulo.toLowerCase().includes('xp')) {
-      return 'OBTER_XP';
-    }
-
-    return 'CONCLUIR_AULAS';
-  }
-
-  private aplicarConclusao(
-    estado: GamificacaoEstado,
-    conclusao: ConclusaoAula
-  ): ResultadoGamificacao {
-    const jaRegistrada = estado.conclusoes.some(
-      item => item.aulaId === conclusao.aulaId
-    );
-
-    if (jaRegistrada) {
-      return {
-        estado,
-        conclusao,
-        missoesAtualizadas: estado.missoes,
-        conquistasDesbloqueadas: []
-      };
-    }
-
-    const metricas = this.atualizarMetricas(estado.metricas, conclusao);
-    const missoesAtualizadas = this.atualizarMissoes(
-      estado.missoes,
-      conclusao
-    );
-    const recompensasMissoes = missoesAtualizadas
-      .filter(missao => missao.concluida && !estado.missoes.some(
-        anterior => anterior.id === missao.id && anterior.concluida
-      ))
-      .reduce((total, missao) => total + missao.xp, 0);
-    const conquistas = this.atualizarConquistas(
-      estado.conquistas,
-      metricas,
-      estado.estatisticas.sequenciaDias,
-      estado.estatisticas
-    );
-    const conquistasDesbloqueadas = conquistas.filter(
-      conquista => conquista.desbloqueada &&
-        !estado.conquistas.some(item => item.id === conquista.id && item.desbloqueada)
-    );
-    const recompensasConquistas = conquistasDesbloqueadas.reduce(
-      (total, conquista) => total + conquista.recompensaXp,
-      0
-    );
-    const xpGanho = conclusao.xpTotal + recompensasMissoes + recompensasConquistas;
-    const estatisticas = this.atualizarEstatisticas(estado.estatisticas, xpGanho);
-    const novoRanking = this.atualizarRanking(estado.rankingUsuario, xpGanho, estatisticas);
-    const novoEstado: GamificacaoEstado = {
-      ...estado,
+    return {
+      usuarioId: ranking.alunos.find(aluno => aluno.ehUsuarioLogado)?.usuarioId ?? 0,
       atualizadoEm: new Date().toISOString(),
       estatisticas,
       metricas,
-      missoes: missoesAtualizadas,
-      conquistas,
-      conclusoes: [...estado.conclusoes, conclusao],
-      rankingUsuario: novoRanking,
-      progressoSemanal: {
-        ...estado.progressoSemanal,
-        totalXp: estado.progressoSemanal.totalXp + xpGanho
-      }
+      missoes: dashboard.missoesDiarias.map(missao => ({
+        id: missao.id,
+        titulo: missao.titulo,
+        xp: missao.recompensaXp,
+        concluida: missao.concluida,
+        tipo: missao.tipo,
+        meta: missao.meta,
+        progressoAtual: missao.progressoAtual,
+        dataReferencia: missao.dataReferencia,
+        dataConclusao: missao.dataConclusao
+      })),
+      conquistas: conquistasApi.map(conquista => ({
+        id: conquista.id,
+        titulo: conquista.titulo,
+        descricao: conquista.descricao,
+        icone: conquista.icone ?? 'emoji_events',
+        desbloqueada: conquista.desbloqueada,
+        progressoAtual: conquista.progressoAtual ?? (conquista.desbloqueada ? conquista.meta : 0),
+        meta: conquista.meta,
+        recompensaXp: conquista.recompensaXp,
+        categoria: 'GERAL' as const
+      })),
+      progressoSemanal: dashboard.progressoSemanal,
+      conclusoes: [],
+      rankingUsuario: ranking.alunos.find(aluno => aluno.ehUsuarioLogado) ?? null
     };
+  }
 
+  private mapearRanking(ranking: BackendRanking): TurmaRanking {
     return {
-      estado: novoEstado,
-      conclusao,
-      missoesAtualizadas,
-      conquistasDesbloqueadas
+      id: ranking.turmaId,
+      nomeTurma: ranking.turmaNome,
+      periodo: '',
+      terminaEmDias: 0,
+      totalAlunos: ranking.alunos.length,
+      posicaoUsuarioLogado: ranking.meuPerfil?.posicao ?? 0,
+      alunos: ranking.alunos.map(aluno => ({
+        posicao: aluno.posicao,
+        usuarioId: aluno.usuarioId,
+        nome: aluno.nome,
+        username: aluno.nome,
+        nivel: aluno.nivel,
+        xpSemana: aluno.xp,
+        sequenciaDias: aluno.streak,
+        tendencia: 'MANTEVE' as const,
+        ehUsuarioLogado: aluno.usuarioId === ranking.meuPerfil?.usuarioId
+      }))
     };
   }
+}
 
-  private atualizarMetricas(
-    metricas: MetricasDesempenho,
-    conclusao: ConclusaoAula
-  ): MetricasDesempenho {
-    const questoesRespondidas = metricas.questoesRespondidas + conclusao.total;
-    const questoesCorretas = metricas.questoesCorretas + conclusao.acertos;
-
-    return {
-      ...metricas,
-      questoesRespondidas,
-      questoesCorretas,
-      aulasConcluidas: metricas.aulasConcluidas + 1,
-      taxaAcerto: questoesRespondidas === 0
-        ? 0
-        : Math.round((questoesCorretas / questoesRespondidas) * 100)
-    };
-  }
-
-  private atualizarMissoes(
-    missoes: MissaoEstado[],
-    conclusao: ConclusaoAula
-  ): MissaoEstado[] {
-    return missoes.map(missao => {
-      if (missao.concluida) {
-        return missao;
-      }
-
-      const incremento =
-        missao.tipo === 'RESPONDER_QUESTOES'
-          ? conclusao.total
-          : missao.tipo === 'ACERTAR_QUESTOES'
-            ? conclusao.acertos
-            : missao.tipo === 'OBTER_XP'
-              ? conclusao.xpTotal
-              : 1;
-      const progressoAtual = Math.min(
-        missao.meta,
-        missao.progressoAtual + incremento
-      );
-      const concluida = progressoAtual >= missao.meta;
-
-      return {
-        ...missao,
-        progressoAtual,
-        concluida,
-        dataConclusao: concluida ? new Date().toISOString() : undefined
-      };
-    });
-  }
-
-  private atualizarConquistas(
-    conquistas: Conquista[],
-    metricas: MetricasDesempenho,
-    sequenciaDias: number,
-    estatisticas: EstatisticasUsuario
-  ): Conquista[] {
-    return conquistas.map(conquista => {
-      const progressoAtual = this.obterProgressoConquista(
-        conquista,
-        metricas,
-        sequenciaDias,
-        estatisticas
-      );
-
-      return {
-        ...conquista,
-        progressoAtual,
-        desbloqueada: progressoAtual >= conquista.meta
-      };
-    });
-  }
-
-  private obterProgressoConquista(
-    conquista: Conquista,
-    metricas: MetricasDesempenho,
-    sequenciaDias: number,
-    estatisticas: EstatisticasUsuario
-  ): number {
-    switch (conquista.id) {
-      case 1:
-        return metricas.aulasConcluidas;
-      case 2:
-      case 4:
-        return sequenciaDias;
-      case 3:
-        return metricas.questoesCorretas;
-      case 5:
-        return Math.floor(metricas.tempoTotalEstudoMinutos / 60);
-      case 6:
-        return estatisticas.nivel;
-      default:
-        return conquista.progressoAtual;
-    }
-  }
-
-  private atualizarEstatisticas(
-    estatisticas: EstatisticasUsuario,
-    xpGanho: number
-  ): EstatisticasUsuario {
-    let nivel = estatisticas.nivel;
-    let xpAtual = estatisticas.xpAtual + xpGanho;
-    let xpProximoNivel = estatisticas.xpProximoNivel;
-
-    while (xpAtual >= xpProximoNivel) {
-      nivel += 1;
-      xpProximoNivel = nivel * 250;
-    }
-
-    return {
-      ...estatisticas,
-      nivel,
-      xpAtual,
-      xpProximoNivel,
-      xpHoje: estatisticas.xpHoje + xpGanho
-    };
-  }
-
-  private atualizarRanking(
-    ranking: AlunoRanking | null,
-    xpGanho: number,
-    estatisticas: EstatisticasUsuario
-  ): AlunoRanking | null {
-    if (!ranking) {
-      return null;
-    }
-
-    return {
-      ...ranking,
-      nivel: estatisticas.nivel,
-      xpSemana: ranking.xpSemana + xpGanho
-    };
-  }
-
-  private obterDataAtual(): string {
-    return new Date().toISOString().slice(0, 10);
-  }
-
-  private obterEstadoSalvo(): GamificacaoEstado | null {
-    const salvo = localStorage.getItem(this.chave);
-
-    if (!salvo) {
-      return null;
-    }
-
-    try {
-      return JSON.parse(salvo) as GamificacaoEstado;
-    } catch {
-      localStorage.removeItem(this.chave);
-      return null;
-    }
-  }
-
-  private persistir(estado: GamificacaoEstado): void {
-    this.estadoInterno.set(estado);
-    localStorage.setItem(this.chave, JSON.stringify(estado));
-  }
+interface BackendConquista {
+  id: number;
+  titulo: string;
+  descricao: string;
+  icone?: string;
+  meta: number;
+  recompensaXp: number;
+  progressoAtual?: number;
+  desbloqueada: boolean;
+}
+interface BackendRanking {
+  turmaId: number;
+  turmaNome: string;
+  alunos: Array<{ posicao: number; usuarioId: number; nome: string; xp: number; nivel: number; streak: number }>;
+  meuPerfil?: { posicao: number; usuarioId: number };
+}
+interface BackendMissao {
+  id: number;
+  titulo: string;
+  tipo: 'RESPONDER_QUESTOES' | 'ACERTAR_QUESTOES' | 'CONCLUIR_AULAS' | 'OBTER_XP';
+  meta: number;
+  progressoAtual: number;
+  recompensaXp: number;
+  concluida: boolean;
+  dataReferencia: string;
+  dataConclusao?: string;
+}
+interface BackendProgressoSemanal {
+  dias: Array<{ data: string; dia: string; xp: number; aulasConcluidas: number; questoesRespondidas: number }>;
+  totalXp: number;
+  diasEstudados: number;
 }

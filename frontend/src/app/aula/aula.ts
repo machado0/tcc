@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AulaService } from '../services/aula-service/aula.service';
 import { DetalheAula } from '../models/models';
@@ -6,8 +6,7 @@ import { AulaCabecalho } from './aula-cabecalho/aula-cabecalho';
 import { AulaTeoria } from './aula-teoria/aula-teoria';
 import { AulaQuestoes } from './aula-questoes/aula-questoes';
 import { MatIconModule } from '@angular/material/icon';
-import { ProgressoService } from '../services/progresso-service/progresso.service';
-import { GamificacaoService } from '../services/gamificacao-service/gamificacao.service';
+import { EstudoService } from '../services/estudo-service/estudo.service';
 
 @Component({
   selector: 'app-aula',
@@ -20,17 +19,19 @@ import { GamificacaoService } from '../services/gamificacao-service/gamificacao.
   templateUrl: './aula.html',
   styleUrl: './aula.css',
 })
-export class Aula implements OnInit {
+export class Aula implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly aulaService = inject(AulaService);
-  private readonly progressoService = inject(ProgressoService);
-  private readonly gamificacaoService = inject(GamificacaoService);
+  private readonly estudoService = inject(EstudoService);
 
   aula = signal<DetalheAula | null>(null);
   abaAtiva = signal<'TEORIA' | 'QUESTOES'>('TEORIA');
   carregando = signal(true);
   erro = signal<string | null>(null);
   conclusaoRegistrada = signal(false);
+  private sessaoId: number | null = null;
+  private sessaoEncerrada = false;
+  private componenteDestruido = false;
 
   ngOnInit(): void {
     this.carregarAula();
@@ -52,6 +53,15 @@ export class Aula implements OnInit {
     this.aulaService.obterDetalheAula(aulaId).subscribe({
       next: (dados) => {
         this.aula.set(dados);
+        this.estudoService.iniciar(dados.id).subscribe({
+          next: sessao => {
+            this.sessaoId = sessao.id;
+            if (this.componenteDestruido) {
+              this.finalizarSessao();
+            }
+          },
+          error: err => console.error('Não foi possível iniciar a sessão de estudo:', err)
+        });
         this.carregando.set(false);
       },
       error: (err) => {
@@ -73,17 +83,20 @@ export class Aula implements OnInit {
       return;
     }
 
-    this.progressoService.registrarConclusao(aulaAtual.id, resultado);
-    this.gamificacaoService.registrarConclusao({
-      aulaId: aulaAtual.id,
-      moduloId: aulaAtual.moduloId,
-      acertos: resultado.acertos,
-      total: resultado.total,
-      xpTotal: resultado.xpTotal
-    }).subscribe({
-      next: () => this.conclusaoRegistrada.set(true),
-      error: erro => console.error('Erro ao atualizar a gamificação:', erro)
+    this.conclusaoRegistrada.set(true);
+    this.finalizarSessao();
+  }
+
+  ngOnDestroy(): void {
+    this.componenteDestruido = true;
+    this.finalizarSessao();
+  }
+
+  private finalizarSessao(): void {
+    if (this.sessaoId === null || this.sessaoEncerrada) return;
+    this.sessaoEncerrada = true;
+    this.estudoService.finalizar(this.sessaoId).subscribe({
+      error: err => console.error('Não foi possível finalizar a sessão de estudo:', err)
     });
   }
 }
-

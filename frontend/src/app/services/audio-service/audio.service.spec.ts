@@ -1,22 +1,26 @@
 import { TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { AudioService } from './audio.service';
+import { ConfiguracaoService } from '../configuracao-service/configuracao.service';
 
 
 describe('AudioService', () => {
   let service: AudioService;
 
   beforeEach(() => {
-    localStorage.clear();
-    TestBed.configureTestingModule({ providers: [AudioService] });
+    TestBed.configureTestingModule({
+      providers: [
+        AudioService,
+        {
+          provide: ConfiguracaoService,
+          useValue: { configuracoes: signal({ efeitosSonoros: false }) }
+        }
+      ]
+    });
     service = TestBed.inject(AudioService);
   });
 
   it('não toca feedback quando os efeitos sonoros estão desativados', () => {
-    localStorage.setItem(
-      'tcc_configuracoes_usuario',
-      JSON.stringify({ efeitosSonoros: false })
-    );
-
     expect(() => service.tocar('acerto')).not.toThrow();
   });
 });

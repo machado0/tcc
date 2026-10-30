@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, tap, timeout } from 'rxjs';
-import { PerfilUsuario, Usuario } from '../../models/models';
+import { Observable, map, tap } from 'rxjs';
+import { Usuario } from '../../models/models';
 
 interface LoginRequest {
   email: string;
@@ -10,40 +10,42 @@ interface LoginRequest {
 
 interface LoginResponse {
   token: string;
+  tipo: string;
+  nome: string;
+  email: string;
+  perfil: string;
+  usuarioId: number;
   usuario: Usuario;
 }
+type RawLoginResponse = Omit<LoginResponse, 'usuario'>;
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = '/api/auth';
-  private readonly mockUsuarioUrl = 'assets/data/mock_usuario.json';
+  private readonly apiUrl = '/api/v1/auth';
 
   login(dados: LoginRequest): Observable<LoginResponse> {
-    if (this.ehCredencialDemo(dados)) {
-      return this.http
-        .get<PerfilUsuario>(this.mockUsuarioUrl)
-        .pipe(
-          map(perfil => ({
-            token: 'token-demo-local',
-            usuario: perfil.usuario
-          })),
-          tap(resposta => this.persistirSessao(resposta))
-        );
-    }
-
     return this.http
-      .post<LoginResponse>(`${this.apiUrl}/login`, dados)
+      .post<RawLoginResponse>(`${this.apiUrl}/login`, dados)
       .pipe(
-        timeout(5000),
+        map(resposta => ({
+          ...resposta,
+          usuario: this.mapearUsuario(resposta)
+        })),
         tap(resposta => this.persistirSessao(resposta))
       );
   }
 
-  private ehCredencialDemo(dados: LoginRequest): boolean {
-    return dados.email === 'joao.silva@exemplo.com' && dados.senha === '123456';
+  private mapearUsuario(resposta: RawLoginResponse): Usuario {
+    return {
+      id: resposta.usuarioId,
+      nome: resposta.nome,
+      email: resposta.email,
+      username: resposta.email,
+      tituloHonra: resposta.perfil
+    };
   }
 
   private persistirSessao(resposta: LoginResponse): void {

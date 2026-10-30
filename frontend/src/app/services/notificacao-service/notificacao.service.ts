@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, of, tap } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Notificacao } from '../../models/models';
 
 @Injectable({
@@ -8,42 +8,17 @@ import { Notificacao } from '../../models/models';
 })
 export class NotificacaoService {
   private readonly http = inject(HttpClient);
-  private readonly chave = 'tcc_notificacoes';
-
   obterNotificacoes(): Observable<Notificacao[]> {
-    const salvas = this.obterSalvas();
-
-    if (salvas) {
-      return of(this.ordenar(salvas));
-    }
-
-    return this.http
-      .get<Notificacao[]>('assets/data/mock_notificacoes.json')
-      .pipe(
-        map(notificacoes => this.ordenar(notificacoes)),
-        tap(notificacoes => this.persistir(notificacoes))
-      );
+    return this.http.get<Notificacao[]>('/api/v1/notificacoes')
+      .pipe(map(notificacoes => this.ordenar(notificacoes)));
   }
 
   marcarComoLida(id: number): Observable<Notificacao[]> {
-    return this.obterNotificacoes().pipe(
-      map(notificacoes => notificacoes.map(notificacao =>
-        notificacao.id === id
-          ? { ...notificacao, lida: true }
-          : notificacao
-      )),
-      tap(notificacoes => this.persistir(notificacoes))
-    );
+    return this.http.patch<Notificacao[]>(`/api/v1/notificacoes/${id}/lida`, {});
   }
 
   marcarTodasComoLidas(): Observable<Notificacao[]> {
-    return this.obterNotificacoes().pipe(
-      map(notificacoes => notificacoes.map(notificacao => ({
-        ...notificacao,
-        lida: true
-      }))),
-      tap(notificacoes => this.persistir(notificacoes))
-    );
+    return this.http.post<Notificacao[]>('/api/v1/notificacoes/marcar-todas-lidas', {});
   }
 
   obterNaoLidas(): Observable<number> {
@@ -58,22 +33,4 @@ export class NotificacaoService {
     );
   }
 
-  private obterSalvas(): Notificacao[] | null {
-    const dados = localStorage.getItem(this.chave);
-
-    if (!dados) {
-      return null;
-    }
-
-    try {
-      return JSON.parse(dados) as Notificacao[];
-    } catch {
-      localStorage.removeItem(this.chave);
-      return null;
-    }
-  }
-
-  private persistir(notificacoes: Notificacao[]): void {
-    localStorage.setItem(this.chave, JSON.stringify(notificacoes));
-  }
 }

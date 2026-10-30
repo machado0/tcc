@@ -1,0 +1,10 @@
+services:
+  database:
+    image: "postgres:latest"
+    ports:
+      - 54320:5432
+    environment:
+      POSTGRES_USER: admin1
+      POSTGRES_PASSWORD: admin1 
+      POSTGRES_DB: gamificacao 
+      JWT_SECRET: VGhpcyBpcyBhIHNlY3JldCBmb3IgZGV2ZWxvcG1lbnQgb25seSBhbmQgbXVzdCBiZSBvdmVycmlkZGVu

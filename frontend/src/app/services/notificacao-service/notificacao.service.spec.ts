@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController } from '@angular/common/http/testing';
 import { NotificacaoService } from './notificacao.service';
 
 const notificacoes = [
@@ -16,9 +17,9 @@ const notificacoes = [
 
 describe('NotificacaoService', () => {
   let service: NotificacaoService;
+  let http: HttpTestingController;
 
   beforeEach(() => {
-    localStorage.clear();
     TestBed.configureTestingModule({
       providers: [
         NotificacaoService,
@@ -27,22 +28,22 @@ describe('NotificacaoService', () => {
       ]
     });
     service = TestBed.inject(NotificacaoService);
+    http = TestBed.inject(HttpTestingController);
   });
 
-  it('persiste e carrega notificacoes locais', () => {
-    localStorage.setItem('tcc_notificacoes', JSON.stringify(notificacoes));
-
+  it('carrega notificacoes pela API', () => {
     service.obterNotificacoes().subscribe(resultado => {
       expect(resultado).toEqual(notificacoes);
     });
+    http.expectOne('/api/v1/notificacoes').flush(notificacoes);
   });
 
   it('marca uma notificacao como lida', () => {
-    localStorage.setItem('tcc_notificacoes', JSON.stringify(notificacoes));
-
     service.marcarComoLida(1).subscribe(resultado => {
       expect(resultado[0].lida).toBe(true);
       expect(service).toBeTruthy();
     });
+    http.expectOne(request => request.url === '/api/v1/notificacoes/1/lida' && request.method === 'PATCH')
+      .flush([{ ...notificacoes[0], lida: true }]);
   });
 });
