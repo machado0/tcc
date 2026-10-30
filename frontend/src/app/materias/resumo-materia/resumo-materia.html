@@ -1,0 +1,93 @@
+<div class="space-y-6">
+
+  <!-- atalho de continuar estudo -->
+  @if (proximaAula(); as proxima) {
+    <div class="bg-surface border border-border rounded-2xl p-6">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs font-bold uppercase tracking-wider text-primary">
+          Onde você parou
+        </span>
+        <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary-light text-primary">
+          Próxima aula
+        </span>
+      </div>
+
+      <p class="text-xs text-foreground-secondary">
+        {{ proxima.modulo.titulo }}
+      </p>
+
+      <h3 class="text-base font-bold text-foreground mt-1">
+        {{ proxima.aula.ordem }}. {{ proxima.aula.titulo }}
+      </h3>
+
+      <div class="flex items-center gap-3 mt-3 text-xs text-foreground-muted">
+        <span class="flex items-center gap-1">
+          <mat-icon class="!w-4 !h-4 !text-[16px]">schedule</mat-icon>
+          {{ proxima.aula.duracaoMinutos }} min
+        </span>
+        <span class="flex items-center gap-1 text-secondary font-semibold">
+          <mat-icon class="!w-4 !h-4 !text-[16px]">bolt</mat-icon>
+          +{{ proxima.aula.xpRecompensa }} XP
+        </span>
+      </div>
+
+      <a 
+        [routerLink]="['/aula', proxima.aula.id]"
+        class="w-full mt-5 px-4 py-2.5 rounded-xl bg-primary text-white hover:bg-primary-hover text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-sm transition">
+        Continuar aula
+        <mat-icon class="!w-4 !h-4 !text-[18px]">arrow_forward</mat-icon>
+      </a>
+    </div>
+  }
+
+  <!-- estatisticas materia -->
+  <div class="bg-surface border border-border rounded-2xl p-6">
+    <h3 class="text-base font-bold text-foreground flex items-center gap-2 mb-4">
+      <mat-icon class="text-primary">query_stats</mat-icon>
+      Resumo da Disciplina
+    </h3>
+
+    <div class="space-y-4">
+      <div class="p-3.5 rounded-xl bg-surface-2 border border-border">
+        <div class="flex justify-between items-center text-xs text-foreground-secondary mb-1.5">
+          <span>Progresso Geral</span>
+          <span class="font-bold text-foreground">{{ materia().progressoPorcentagem }}%</span>
+        </div>
+        <div class="h-2 w-full bg-border rounded-full overflow-hidden">
+          <div 
+            class="h-full bg-primary rounded-full transition-all duration-300"
+            [style.width.%]="materia().progressoPorcentagem">
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 text-center">
+        <div class="p-3 rounded-xl border border-border">
+          <span class="text-xs text-foreground-secondary">Módulos</span>
+          <p class="text-xl font-bold text-foreground mt-1">
+            {{ materia().modulos.length }}
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl border border-border">
+          <span class="text-xs text-foreground-secondary">Aulas Feitas</span>
+          <p class="text-xl font-bold text-foreground mt-1">
+            {{ materia().aulasConcluidas }}/{{ materia().totalAulas }}
+          </p>
+        </div>
+      </div>
+
+      <div class="p-3.5 rounded-xl bg-secondary-light/40 border border-secondary/20 flex items-center justify-between text-xs">
+        <span class="text-foreground-secondary flex items-center gap-1.5">
+          <mat-icon class="text-secondary !w-4 !h-4 !text-[16px]">bolt</mat-icon>
+          Total acumulável
+        </span>
+        <span class="font-bold text-secondary text-sm">
+          +{{ totalXpDisponivel() }} XP
+        </span>
+      </div>
+    </div>
+  </div>
+
+</div>
+

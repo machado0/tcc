@@ -1,0 +1,123 @@
+<div class="bg-surface border border-border rounded-2xl p-6">
+  
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div>
+      <h2 class="text-lg font-bold text-foreground flex items-center gap-2">
+        <mat-icon class="text-warning">military_tech</mat-icon>
+        Mural de Conquistas
+      </h2>
+      <p class="text-xs text-foreground-secondary mt-0.5">
+        {{ totalDesbloqueadas() }} de {{ conquistas().length }} medalhas conquistadas
+      </p>
+    </div>
+
+    <!-- abas de filtro -->
+    <div class="flex items-center gap-1.5 p-1 bg-surface-2 rounded-xl border border-border text-xs font-medium self-start sm:self-auto">
+      <button 
+        type="button"
+        (click)="definirFiltro('TODAS')"
+        [class.bg-surface]="filtroAtual() === 'TODAS'"
+        [class.text-primary]="filtroAtual() === 'TODAS'"
+        [class.shadow-sm]="filtroAtual() === 'TODAS'"
+        [class.text-foreground-secondary]="filtroAtual() !== 'TODAS'"
+        class="px-3 py-1.5 rounded-lg transition-all cursor-pointer">
+        Todas ({{ conquistas().length }})
+      </button>
+
+      <button 
+        type="button"
+        (click)="definirFiltro('DESBLOQUEADAS')"
+        [class.bg-surface]="filtroAtual() === 'DESBLOQUEADAS'"
+        [class.text-primary]="filtroAtual() === 'DESBLOQUEADAS'"
+        [class.shadow-sm]="filtroAtual() === 'DESBLOQUEADAS'"
+        [class.text-foreground-secondary]="filtroAtual() !== 'DESBLOQUEADAS'"
+        class="px-3 py-1.5 rounded-lg transition-all cursor-pointer">
+        Desbloqueadas ({{ totalDesbloqueadas() }})
+      </button>
+
+      <button 
+        type="button"
+        (click)="definirFiltro('BLOQUEADAS')"
+        [class.bg-surface]="filtroAtual() === 'BLOQUEADAS'"
+        [class.text-primary]="filtroAtual() === 'BLOQUEADAS'"
+        [class.shadow-sm]="filtroAtual() === 'BLOQUEADAS'"
+        [class.text-foreground-secondary]="filtroAtual() !== 'BLOQUEADAS'"
+        class="px-3 py-1.5 rounded-lg transition-all cursor-pointer">
+        Bloqueadas ({{ conquistas().length - totalDesbloqueadas() }})
+      </button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    @for (conquista of conquistasFiltradas(); track conquista.id) {
+      <div 
+        class="p-4 rounded-xl border transition-all"
+        [class.bg-surface]="conquista.desbloqueada"
+        [class.border-border]="conquista.desbloqueada"
+        [class.bg-surface-2]="!conquista.desbloqueada"
+        [class.border-dashed]="!conquista.desbloqueada"
+        [class.border-border-strong]="!conquista.desbloqueada"
+        [class.opacity-85]="!conquista.desbloqueada">
+        
+        <div class="flex items-start gap-3.5">
+          <div 
+            class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
+            [class.bg-warning-light]="conquista.desbloqueada"
+            [class.text-warning]="conquista.desbloqueada"
+            [class.bg-border]="!conquista.desbloqueada"
+            [class.text-foreground-muted]="!conquista.desbloqueada">
+            <mat-icon class="!w-6 !h-6">{{ conquista.icone }}</mat-icon>
+          </div>
+
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="font-bold text-sm text-foreground truncate">
+                {{ conquista.titulo }}
+              </h3>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full shrink-0"
+                [class.bg-secondary-light]="conquista.desbloqueada"
+                [class.text-secondary]="conquista.desbloqueada"
+                [class.bg-border]="!conquista.desbloqueada"
+                [class.text-foreground-muted]="!conquista.desbloqueada">
+                +{{ conquista.recompensaXp }} XP
+              </span>
+            </div>
+
+            <p class="text-xs text-foreground-secondary mt-1 leading-relaxed">
+              {{ conquista.descricao }}
+            </p>
+
+            <div class="mt-3">
+              @if (conquista.desbloqueada) {
+                <span class="inline-flex items-center gap-1 text-xs font-medium text-success">
+                  <mat-icon class="!w-4 !h-4 !text-[16px]">check_circle</mat-icon>
+                  Conquistada!
+                </span>
+              } @else {
+                <div>
+                  <div class="flex justify-between items-center text-[11px] text-foreground-muted mb-1">
+                    <span>Progresso</span>
+                    <span>{{ conquista.progressoAtual }} / {{ conquista.meta }}</span>
+                  </div>
+                  <div class="h-1.5 w-full bg-border rounded-full overflow-hidden">
+                    <div 
+                      class="h-full bg-primary rounded-full transition-all"
+                      [style.width.%]="calcularProgresso(conquista)">
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    } @empty {
+      <div class="col-span-full py-8 text-center text-foreground-secondary text-sm">
+        Nenhuma conquista encontrada nesta categoria.
+      </div>
+    }
+  </div>
+
+</div>

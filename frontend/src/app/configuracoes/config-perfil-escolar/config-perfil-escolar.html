@@ -1,0 +1,64 @@
+<!-- dados institucionais aluno -->
+<div class="bg-surface border border-border rounded-2xl p-6 sm:p-8">
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-primary-light text-primary flex items-center justify-center">
+        <mat-icon class="!w-5 !h-5 !text-[20px]">badge</mat-icon>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold text-foreground">
+          Vínculo Escolar
+        </h2>
+        <p class="text-xs text-foreground-secondary">
+          Informações cadastradas pela secretaria da escola.
+        </p>
+      </div>
+    </div>
+
+    <span class="px-2.5 py-1 rounded-full bg-success-light text-success text-xs font-semibold flex items-center gap-1">
+      <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">verified</mat-icon>
+      Matrícula Ativa
+    </span>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <!-- n matricula -->
+    <div class="p-4 rounded-xl bg-surface-2 border border-border">
+      <span class="text-xs text-foreground-secondary">Matrícula Escolar</span>
+      <p class="font-bold text-foreground text-sm mt-1 flex items-center gap-2">
+        {{ config().matricula }}
+        <mat-icon class="!w-4 !h-4 !text-[16px] text-foreground-muted">lock</mat-icon>
+      </p>
+    </div>
+
+    <!-- turma -->
+    <div class="p-4 rounded-xl bg-surface-2 border border-border">
+      <span class="text-xs text-foreground-secondary">Turma Atual</span>
+      <p class="font-bold text-foreground text-sm mt-1">
+        {{ config().turma }}
+      </p>
+    </div>
+
+    <!-- escola -->
+    <div class="p-4 rounded-xl bg-surface-2 border border-border sm:col-span-2">
+      <span class="text-xs text-foreground-secondary">Unidade Escolar</span>
+      <p class="font-bold text-foreground text-sm mt-1 flex items-center gap-2">
+        <mat-icon class="!w-4 !h-4 !text-[16px] text-primary">school</mat-icon>
+        {{ config().escola }}
+      </p>
+    </div>
+
+    <!-- email responsaveis -->
+    <div class="p-4 rounded-xl bg-surface border border-border sm:col-span-2">
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-xs font-medium text-foreground-secondary">Email dos Pais ou Responsáveis</span>
+        <span class="text-[11px] text-primary font-semibold">Para relatórios</span>
+      </div>
+      <p class="font-semibold text-foreground text-sm flex items-center gap-2">
+        <mat-icon class="!w-4 !h-4 !text-[16px] text-secondary">family_restroom</mat-icon>
+        {{ config().emailResponsaveis }}
+      </p>
+    </div>
+  </div>
+</div>
+

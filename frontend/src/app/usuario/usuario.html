@@ -1,0 +1,119 @@
+<div class="py-6 space-y-6 max-w-7xl mx-auto w-full">
+  
+  @if (carregando()) {
+    <div class="flex flex-col items-center justify-center py-24 text-foreground-secondary gap-3">
+      <mat-icon class="animate-spin text-primary w-8! h-8! text-[32px]!">progress_activity</mat-icon>
+      <p class="text-sm font-medium">
+        Carregando perfil do usuário...
+      </p>
+    </div>
+  } @else if (erro()) {
+    <div class="p-6 rounded-2xl bg-danger-light border border-danger/20 text-danger text-center max-w-lg mx-auto">
+      <mat-icon class="w-8! h-8! text-[32px]! mb-2">error_outline</mat-icon>
+      <p class="font-semibold">{{ erro() }}</p>
+      <button 
+        type="button"
+        (click)="carregarPerfil()"
+        class="mt-4 px-4 py-2 rounded-xl bg-danger text-white text-sm font-medium hover:opacity-90 cursor-pointer">
+        Tentar novamente
+      </button>
+    </div>
+  } @else if (perfil(); as p) {
+    @if (mensagemSalva()) {
+      <p class="rounded-xl border border-success/20 bg-success-light px-4 py-3 text-sm text-success" role="status">
+        {{ mensagemSalva() }}
+      </p>
+    }
+
+    <section>
+      <app-perfil-cabecalho 
+        [usuario]="p.usuario" 
+        [estatisticas]="p.estatisticas" />
+    </section>
+
+    <section class="rounded-2xl border border-border bg-surface p-6">
+      @if (!editando()) {
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="text-lg font-bold text-foreground">Dados do perfil</h2>
+            <p class="mt-1 text-sm text-foreground-secondary">
+              Atualize as informações usadas na sua conta.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 self-start rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-white transition hover:bg-primary-hover"
+            (click)="iniciarEdicao()">
+            <mat-icon>edit</mat-icon>
+            Editar perfil
+          </button>
+        </div>
+      } @else {
+        <form class="grid gap-4 md:grid-cols-3" (ngSubmit)="salvarPerfil()">
+          <div>
+            <label class="text-sm font-medium text-foreground" for="nome">Nome</label>
+            <input
+              id="nome"
+              name="nome"
+              class="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              [(ngModel)]="nomeEditado"
+              required />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium text-foreground" for="username">Usuário</label>
+            <input
+              id="username"
+              name="username"
+              class="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              [(ngModel)]="usernameEditado" />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium text-foreground" for="email">E-mail</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              class="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              [(ngModel)]="emailEditado"
+              required />
+          </div>
+
+          <div class="flex flex-wrap justify-end gap-3 md:col-span-3">
+            <button
+              type="button"
+              class="rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-surface-2"
+              (click)="cancelarEdicao()">
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-white transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
+              [disabled]="salvando()">
+              {{ salvando() ? 'Salvando...' : 'Salvar alterações' }}
+            </button>
+          </div>
+        </form>
+      }
+    </section>
+
+    <section>
+      <app-perfil-estatisticas 
+        [estatisticas]="p.estatisticas" />
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <section class="lg:col-span-2">
+        <app-perfil-conquistas 
+          [conquistas]="p.conquistas" />
+      </section>
+
+      <section class="lg:col-span-1">
+        <app-perfil-desempenho 
+          [metricas]="p.metricas" />
+      </section>
+    </div>
+  }
+
+</div>

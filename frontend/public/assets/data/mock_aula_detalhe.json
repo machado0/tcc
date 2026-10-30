@@ -1,0 +1,54 @@
+{
+  "id": 1008,
+  "moduloId": 103,
+  "materiaNome": "Matemática",
+  "moduloNome": "Estudo das Funções",
+  "titulo": "Funções do 1º Grau (Afim)",
+  "descricao": "Aprenda a identificar a taxa de variação, coeficiente angular, coeficiente linear e o comportamento da reta no plano cartesiano.",
+  "duracaoMinutos": 30,
+  "xpTotal": 50,
+  "conteudoTeorico": {
+    "resumo": "Uma função do 1º grau (ou afim) é toda função na forma f(x) = ax + b, onde a e b são números reais e a ≠ 0. O valor de 'a' é o coeficiente angular (indica a inclinação da reta e a taxa de variação) e 'b' é o coeficiente linear (ponto exato onde a reta intercepta o eixo vertical y).",
+    "pontosChave": [
+      "Forma Geral: f(x) = ax + b (com a ≠ 0)",
+      "Coeficiente Angular (a): Se a > 0, a função é estritamente crescente. Se a < 0, a função é decrescente.",
+      "Coeficiente Linear (b): Valor de f(0), onde a reta corta o eixo y no par ordenado (0, b).",
+      "Raiz ou Zero da Função: Valor de x que torna f(x) = 0, obtido isolando x na equação ax + b = 0 -> x = -b/a."
+    ],
+    "dicaProfessor": "Nas provas do ENEM e vestibulares, o coeficiente angular 'a' quase sempre representa o valor unitário variável (ex: preço por quilômetro rodado), enquanto o coeficiente linear 'b' representa o valor fixo ou taxa inicial (ex: bandeirada do táxi).",
+    "exemploPratico": "Um plano de internet custa R$ 50 fixos por mês mais R$ 2 por giga adicional consumido. A lei da função é C(x) = 2x + 50, onde x é a quantidade de gigas extras consumidos."
+  },
+  "questoes": [
+    {
+      "id": 5001,
+      "ordem": 1,
+      "enunciado": "Um motorista de aplicativo cobra uma taxa fixa de partida de R$ 6,00 mais R$ 2,50 por cada quilômetro rodado. Qual é a lei da função que expressa o valor total V(x) pago por uma corrida em função dos quilômetros x percorridos?",
+      "contextoEscolar": "Aplicação Prática / ENEM",
+      "opcoes": [
+        { "id": 1, "letra": "A", "texto": "V(x) = 6x + 2,50" },
+        { "id": 2, "letra": "B", "texto": "V(x) = 2,50x + 6,00" },
+        { "id": 3, "letra": "C", "texto": "V(x) = 8,50x" },
+        { "id": 4, "letra": "D", "texto": "V(x) = 2,50x - 6,00" }
+      ],
+      "opcaoCorretaId": 2,
+      "explicacaoPedagogica": "O valor fixo (R$ 6,00) é o coeficiente linear b, que não depende de x. O valor que multiplica a variável quilômetro (R$ 2,50) é a taxa de variação (coeficiente angular a). Portanto, a função correta é V(x) = 2,50x + 6,00.",
+      "xpRecompensa": 25
+    },
+    {
+      "id": 5002,
+      "ordem": 2,
+      "enunciado": "Dada a função f(x) = -3x + 12, determine a raiz (zero da função) e classifique-a quanto ao seu crescimento:",
+      "contextoEscolar": "Álgebra Fundamental",
+      "opcoes": [
+        { "id": 5, "letra": "A", "texto": "Raiz x = 4 e a função é decrescente." },
+        { "id": 6, "letra": "B", "texto": "Raiz x = -4 e a função é crescente." },
+        { "id": 7, "letra": "C", "texto": "Raiz x = 12 e a função é decrescente." },
+        { "id": 8, "letra": "D", "texto": "Raiz x = 4 e a função é crescente." }
+      ],
+      "opcaoCorretaId": 5,
+      "explicacaoPedagogica": "Para achar a raiz, igualamos a zero: -3x + 12 = 0 -> 3x = 12 -> x = 4. Como o coeficiente angular a = -3 é menor que zero (negativo), a reta possui inclinação descendente, logo a função é estritamente decrescente.",
+      "xpRecompensa": 25
+    }
+  ]
+}
+

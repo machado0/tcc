@@ -1,0 +1,78 @@
+<div class="mx-auto w-full max-w-7xl py-6">
+  @if (carregando()) {
+    <div class="flex min-h-64 items-center justify-center text-sm text-foreground-secondary">
+      Carregando notificações...
+    </div>
+  } @else if (erro()) {
+    <section class="mx-auto max-w-lg rounded-2xl border border-danger/20 bg-danger-light p-6 text-center text-danger">
+      <h1 class="font-semibold">Não foi possível carregar as notificações</h1>
+      <p class="mt-2 text-sm">{{ erro() }}</p>
+      <button
+        type="button"
+        class="mt-4 rounded-xl bg-danger px-4 py-2 text-sm font-medium text-white"
+        (click)="carregar()">
+        Tentar novamente
+      </button>
+    </section>
+  } @else {
+    <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-foreground">Notificações</h1>
+        <p class="mt-1 text-sm text-foreground-secondary">
+          Acompanhe avisos importantes sobre sua jornada de estudos.
+        </p>
+      </div>
+
+      @if (temNaoLidas()) {
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 self-start rounded-xl border border-border px-4 py-2 text-sm font-medium text-foreground transition hover:bg-surface-2 sm:self-auto"
+          (click)="marcarTodasComoLidas()">
+          <mat-icon>done_all</mat-icon>
+          Marcar todas como lidas
+        </button>
+      }
+    </header>
+
+    <section class="mt-6 space-y-3">
+      @for (notificacao of notificacoes(); track notificacao.id) {
+        <button
+          type="button"
+          class="flex w-full items-start gap-4 rounded-2xl border p-5 text-left transition hover:bg-surface-2"
+          [class.border-primary/30]="!notificacao.lida"
+          [class.bg-primary-light/20]="!notificacao.lida"
+          [class.border-border]="notificacao.lida"
+          [class.bg-surface]="notificacao.lida"
+          (click)="abrir(notificacao)">
+          <span
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+            [class.bg-primary-light]="!notificacao.lida"
+            [class.text-primary]="!notificacao.lida"
+            [class.bg-surface-2]="notificacao.lida"
+            [class.text-foreground-secondary]="notificacao.lida">
+            <mat-icon>{{ icone(notificacao.tipo) }}</mat-icon>
+          </span>
+
+          <span class="min-w-0 flex-1">
+            <span class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <span class="font-semibold text-foreground">{{ notificacao.titulo }}</span>
+              <span class="text-xs text-foreground-muted">{{ notificacao.criadaEm | date: 'dd/MM/yyyy HH:mm' }}</span>
+            </span>
+            <span class="mt-1 block text-sm text-foreground-secondary">{{ notificacao.mensagem }}</span>
+          </span>
+
+          @if (!notificacao.lida) {
+            <span class="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-primary" aria-label="Não lida"></span>
+          }
+        </button>
+      } @empty {
+        <section class="rounded-2xl border border-dashed border-border bg-surface p-8 text-center">
+          <h2 class="font-semibold text-foreground">Nenhuma notificação por enquanto</h2>
+          <p class="mt-2 text-sm text-foreground-secondary">
+            Novos avisos aparecerão aqui quando estiverem disponíveis.
+          </p>
+        </section>
+      }
+    </section>
+  }
+</div>

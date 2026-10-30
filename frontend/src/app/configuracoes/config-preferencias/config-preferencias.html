@@ -1,0 +1,260 @@
+<div class="space-y-6">
+
+  <!-- acessibilidade e visualizacao -->
+  <div class="bg-surface border border-border rounded-2xl p-6 sm:p-8">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-10 h-10 rounded-xl bg-secondary-light text-secondary flex items-center justify-center">
+        <mat-icon class="!w-5 !h-5 !text-[20px]">visibility</mat-icon>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold text-foreground">
+          Acessibilidade & Interface
+        </h2>
+        <p class="text-xs text-foreground-secondary">
+          Ajustes para uso em sala de aula, laboratórios e conforto visual.
+        </p>
+      </div>
+    </div>
+
+    <div class="space-y-5">
+      <!-- tamanho da fonte -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-surface-2 border border-border">
+        <div>
+          <p class="font-bold text-sm text-foreground">Tamanho do Texto</p>
+          <p class="text-xs text-foreground-secondary">Aumente para facilitar leitura em telas de computadores escolares.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            (click)="definirFonte('padrao')"
+            [class.bg-surface]="tamanhoFonte() === 'padrao'"
+            [class.text-primary]="tamanhoFonte() === 'padrao'"
+            [class.shadow-sm]="tamanhoFonte() === 'padrao'"
+            [class.text-foreground-secondary]="tamanhoFonte() !== 'padrao'"
+            class="px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-border cursor-pointer transition">
+            Padrão
+          </button>
+          <button
+            type="button"
+            (click)="definirFonte('grande')"
+            [class.bg-surface]="tamanhoFonte() === 'grande'"
+            [class.text-primary]="tamanhoFonte() === 'grande'"
+            [class.shadow-sm]="tamanhoFonte() === 'grande'"
+            [class.text-foreground-secondary]="tamanhoFonte() !== 'grande'"
+            class="px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-border cursor-pointer transition">
+            Grande (+20%)
+          </button>
+        </div>
+      </div>
+
+      <!-- tema -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-surface-2 border border-border">
+        <div>
+          <p class="font-bold text-sm text-foreground">Aparência do Tema</p>
+          <p class="text-xs text-foreground-secondary">Escolha entre modo claro, escuro ou automático do sistema.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            (click)="definirTema('claro')"
+            [class.bg-surface]="tema() === 'claro'"
+            [class.text-primary]="tema() === 'claro'"
+            [class.shadow-sm]="tema() === 'claro'"
+            [class.text-foreground-secondary]="tema() !== 'claro'"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-border cursor-pointer transition">
+            Claro
+          </button>
+          <button
+            type="button"
+            (click)="definirTema('escuro')"
+            [class.bg-surface]="tema() === 'escuro'"
+            [class.text-primary]="tema() === 'escuro'"
+            [class.shadow-sm]="tema() === 'escuro'"
+            [class.text-foreground-secondary]="tema() !== 'escuro'"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-border cursor-pointer transition">
+            Escuro
+          </button>
+          <button
+            type="button"
+            (click)="definirTema('sistema')"
+            [class.bg-surface]="tema() === 'sistema'"
+            [class.text-primary]="tema() === 'sistema'"
+            [class.shadow-sm]="tema() === 'sistema'"
+            [class.text-foreground-secondary]="tema() !== 'sistema'"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-border cursor-pointer transition">
+            Automático
+          </button>
+        </div>
+      </div>
+
+      <!-- alto contraste -->
+      <div class="flex items-center justify-between p-4 rounded-xl bg-surface-2 border border-border">
+        <div>
+          <p class="font-bold text-sm text-foreground">Modo de Alto Contraste</p>
+          <p class="text-xs text-foreground-secondary">Reforça as bordas e saturação para ambientes muito iluminados.</p>
+        </div>
+
+        <button
+          type="button"
+          (click)="alternarContraste()"
+          [class.bg-primary]="altoContraste()"
+          [class.bg-border]="!altoContraste()"
+          class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none">
+          <span
+            [class.translate-x-5]="altoContraste()"
+            [class.translate-x-0]="!altoContraste()"
+            class="pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out">
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- avisos e comunicacao escolar -->
+  <div class="bg-surface border border-border rounded-2xl p-6 sm:p-8">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-10 h-10 rounded-xl bg-warning-light text-warning flex items-center justify-center">
+        <mat-icon class="!w-5 !h-5 !text-[20px]">notifications</mat-icon>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold text-foreground">
+          Lembretes & Avisos Escolares
+        </h2>
+        <p class="text-xs text-foreground-secondary">
+          Controle os avisos de tarefas e comunicação com a família.
+        </p>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <div class="flex items-center justify-between p-3.5 rounded-xl border border-border">
+        <div>
+          <p class="font-bold text-sm text-foreground">Lembretes de Tarefas de Casa</p>
+          <p class="text-xs text-foreground-secondary">Avisa 24h antes do prazo final de entrega das atividades.</p>
+        </div>
+        <button
+          type="button"
+          (click)="alternarTarefas()"
+          [class.bg-primary]="notificarTarefas()"
+          [class.bg-border]="!notificarTarefas()"
+          class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out">
+          <span
+            [class.translate-x-5]="notificarTarefas()"
+            [class.translate-x-0]="!notificarTarefas()"
+            class="pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow transition duration-200 ease-in-out">
+          </span>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between p-3.5 rounded-xl border border-border">
+        <div>
+          <p class="font-bold text-sm text-foreground">Avisos de Provas e Avaliações</p>
+          <p class="text-xs text-foreground-secondary">Notificações com o calendário de testes agendados pelo professor.</p>
+        </div>
+        <button
+          type="button"
+          (click)="alternarProvas()"
+          [class.bg-primary]="notificarProvas()"
+          [class.bg-border]="!notificarProvas()"
+          class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out">
+          <span
+            [class.translate-x-5]="notificarProvas()"
+            [class.translate-x-0]="!notificarProvas()"
+            class="pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow transition duration-200 ease-in-out">
+          </span>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between p-3.5 rounded-xl border border-border">
+        <div>
+          <p class="font-bold text-sm text-foreground">Relatório Semanal para os Pais</p>
+          <p class="text-xs text-foreground-secondary">Envia o resumo de estudos e frequência semanal para o e-mail dos responsáveis.</p>
+        </div>
+        <button
+          type="button"
+          (click)="alternarResumoPais()"
+          [class.bg-primary]="resumoSemanalPais()"
+          [class.bg-border]="!resumoSemanalPais()"
+          class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out">
+          <span
+            [class.translate-x-5]="resumoSemanalPais()"
+            [class.translate-x-0]="!resumoSemanalPais()"
+            class="pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow transition duration-200 ease-in-out">
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- gamificacao e sons -->
+  <div class="bg-surface border border-border rounded-2xl p-6 sm:p-8">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-10 h-10 rounded-xl bg-success-light text-success flex items-center justify-center">
+        <mat-icon class="!w-5 !h-5 !text-[20px]">sports_esports</mat-icon>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold text-foreground">
+          Sons & Efeitos de Gamificação
+        </h2>
+        <p class="text-xs text-foreground-secondary">
+          Personalize as recompensas sensoriais ao estudar.
+        </p>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <div class="flex items-center justify-between p-3.5 rounded-xl border border-border">
+        <div>
+          <p class="font-bold text-sm text-foreground">Efeitos Sonoros</p>
+          <p class="text-xs text-foreground-secondary">Toca som de acerto, erro e subida de nível.</p>
+        </div>
+        <button
+          type="button"
+          (click)="alternarSons()"
+          [class.bg-primary]="efeitosSonoros()"
+          [class.bg-border]="!efeitosSonoros()"
+          class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out">
+          <span
+            [class.translate-x-5]="efeitosSonoros()"
+            [class.translate-x-0]="!efeitosSonoros()"
+            class="pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow transition duration-200 ease-in-out">
+          </span>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between p-3.5 rounded-xl border border-border">
+        <div>
+          <p class="font-bold text-sm text-foreground">Animações de Conquistas</p>
+          <p class="text-xs text-foreground-secondary">Exibe confetes e celebrações visuais na tela.</p>
+        </div>
+        <button
+          type="button"
+          (click)="alternarAnimacoes()"
+          [class.bg-primary]="animacoesGamificacao()"
+          [class.bg-border]="!animacoesGamificacao()"
+          class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out">
+          <span
+            [class.translate-x-5]="animacoesGamificacao()"
+            [class.translate-x-0]="!animacoesGamificacao()"
+            class="pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow transition duration-200 ease-in-out">
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- salvar alteracoes -->
+  <div class="flex justify-end pt-2">
+    <button
+      type="button"
+      (click)="aoSalvar()"
+      class="px-6 py-3 rounded-xl bg-primary text-white hover:bg-primary-hover font-bold text-sm flex items-center gap-2 cursor-pointer shadow-sm transition">
+      <mat-icon class="!w-4 !h-4 !text-[18px]">save</mat-icon>
+      Salvar Preferências
+    </button>
+  </div>
+
+</div>
+

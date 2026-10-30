@@ -1,0 +1,67 @@
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+  @for (materia of materias(); track materia.id) {
+    <button
+      type="button"
+      (click)="aoSelecionar(materia)"
+      [disabled]="!materia.disponivel"
+      [class.border-primary]="materia.disponivel && materia.id === materiaSelecionada().id"
+      [class.ring-2]="materia.disponivel && materia.id === materiaSelecionada().id"
+      [class.ring-primary/20]="materia.disponivel && materia.id === materiaSelecionada().id"
+      [class.bg-surface]="materia.disponivel"
+      [class.cursor-pointer]="materia.disponivel"
+      [class.bg-surface-2]="!materia.disponivel"
+      [class.border-dashed]="!materia.disponivel"
+      [class.opacity-60]="!materia.disponivel"
+      [class.cursor-not-allowed]="!materia.disponivel"
+      class="text-left p-4 rounded-2xl border border-border transition-all duration-200 hover:border-border-strong relative flex flex-col justify-between">
+      
+      <div class="flex items-start justify-between gap-3 mb-3">
+        <div class="flex items-center gap-3">
+          <div 
+            class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+            [class.bg-primary-light]="materia.disponivel"
+            [class.text-primary]="materia.disponivel"
+            [class.bg-border]="!materia.disponivel"
+            [class.text-foreground-muted]="!materia.disponivel">
+            <mat-icon class="!w-5 !h-5 !text-[20px]">{{ materia.icone }}</mat-icon>
+          </div>
+
+          <div>
+            <h3 class="font-bold text-foreground text-base">
+              {{ materia.nome }}
+            </h3>
+            <p class="text-xs text-foreground-secondary line-clamp-1">
+              {{ materia.descricao }}
+            </p>
+          </div>
+        </div>
+
+        @if (!materia.disponivel) {
+          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-border text-foreground-muted shrink-0">
+            Em breve
+          </span>
+        } @else if (materia.id === materiaSelecionada().id) {
+          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary-light text-primary shrink-0">
+            Ativa
+          </span>
+        }
+      </div>
+
+      @if (materia.disponivel) {
+        <div class="space-y-1.5 mt-2 pt-2 border-t border-border/60">
+          <div class="flex justify-between items-center text-xs text-foreground-secondary">
+            <span>Progresso</span>
+            <span class="font-semibold text-foreground">{{ materia.aulasConcluidas }}/{{ materia.totalAulas }} aulas</span>
+          </div>
+          <div class="h-1.5 w-full bg-border rounded-full overflow-hidden">
+            <div 
+              class="h-full bg-primary rounded-full transition-all duration-300"
+              [style.width.%]="materia.progressoPorcentagem">
+            </div>
+          </div>
+        </div>
+      }
+    </button>
+  }
+</div>
+

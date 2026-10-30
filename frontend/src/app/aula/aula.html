@@ -1,0 +1,44 @@
+<div class="py-6 space-y-6 max-w-5xl mx-auto w-full">
+
+  @if (carregando()) {
+    <div class="flex flex-col items-center justify-center py-24 text-foreground-secondary gap-3">
+      <mat-icon class="animate-spin text-primary !w-8 !h-8 !text-[32px]">progress_activity</mat-icon>
+      <p class="text-sm font-medium">Carregando aula e exercícios...</p>
+    </div>
+  } @else if (erro()) {
+    <div class="p-6 rounded-2xl bg-danger-light border border-danger/20 text-danger text-center max-w-lg mx-auto">
+      <mat-icon class="!w-8 !h-8 !text-[32px] mb-2">error_outline</mat-icon>
+      <p class="font-semibold">{{ erro() }}</p>
+      <button 
+        type="button"
+        (click)="carregarAula()"
+        class="mt-4 px-4 py-2 rounded-xl bg-danger text-white text-sm font-medium hover:opacity-90 cursor-pointer">
+        Tentar novamente
+      </button>
+    </div>
+  } @else if (aula(); as a) {
+    
+    <!-- cabecalho aula -->
+    <section>
+      <app-aula-cabecalho
+        [aula]="a"
+        [abaAtiva]="abaAtiva()"
+        (trocarAba)="aoTrocarAba($event)" />
+    </section>
+
+    <!-- conteudo/questoes -->
+    <section>
+      @if (abaAtiva() === 'TEORIA') {
+        <app-aula-teoria
+          [conteudo]="a.conteudoTeorico"
+          (irParaExercicios)="aoTrocarAba('QUESTOES')" />
+      } @else {
+        <app-aula-questoes
+          [questoes]="a.questoes"
+          (aulaConcluida)="aoConcluirAula($event)" />
+      }
+    </section>
+  }
+
+</div>
+

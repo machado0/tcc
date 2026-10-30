@@ -1,0 +1,73 @@
+<div class="space-y-6">
+
+  <!-- teoria -->
+  <div class="bg-surface border border-border rounded-2xl p-6 sm:p-8">
+    <div class="flex items-center gap-2.5 mb-4">
+      <div class="w-9 h-9 rounded-xl bg-primary-light text-primary flex items-center justify-center">
+        <mat-icon class="!w-5 !h-5 !text-[20px]">lightbulb</mat-icon>
+      </div>
+      <h2 class="text-lg font-bold text-foreground">
+        Resumo Conceitual
+      </h2>
+    </div>
+
+    <p class="text-sm sm:text-base text-foreground leading-relaxed">
+      {{ conteudo().resumo }}
+    </p>
+
+    <!-- pontos-chave -->
+    <div class="mt-6 pt-6 border-t border-border">
+      <h3 class="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+        <mat-icon class="text-primary !w-4 !h-4 !text-[16px]">check_circle</mat-icon>
+        Pontos Importantes para Fixar:
+      </h3>
+      <ul class="space-y-2.5">
+        @for (ponto of conteudo().pontosChave; track $index) {
+          <li class="flex items-start gap-2.5 text-xs sm:text-sm text-foreground-secondary">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></span>
+            <span>{{ ponto }}</span>
+          </li>
+        }
+      </ul>z
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    
+    <!-- ex pratico -->
+    <div class="bg-surface border border-border rounded-2xl p-6">
+      <div class="flex items-center gap-2 mb-3">
+        <mat-icon class="text-secondary !w-5 !h-5 !text-[20px]">calculate</mat-icon>
+        <h3 class="text-sm font-bold text-foreground">Exemplo Prático</h3>
+      </div>
+      <p class="text-xs sm:text-sm text-foreground-secondary leading-relaxed">
+        {{ conteudo().exemploPratico }}
+      </p>
+    </div>
+
+    <!-- dica -->
+    <div class="bg-warning-light/30 border border-warning/30 rounded-2xl p-6">
+      <div class="flex items-center gap-2 mb-3">
+        <mat-icon class="text-warning !w-5 !h-5 !text-[20px]">school</mat-icon>
+        <h3 class="text-sm font-bold text-warning-strong">Dica do Professor</h3>
+      </div>
+      <p class="text-xs sm:text-sm text-foreground-secondary leading-relaxed">
+        {{ conteudo().dicaProfessor }}
+      </p>
+    </div>
+
+  </div>
+
+  <!-- botao exercicios -->
+  <div class="flex justify-end pt-2">
+    <button
+      type="button"
+      (click)="iniciarExercicios()"
+      class="px-6 py-3 rounded-xl bg-primary text-white hover:bg-primary-hover font-bold text-sm flex items-center gap-2 cursor-pointer shadow-sm transition">
+      Praticar com os Exercícios
+      <mat-icon class="!w-4 !h-4 !text-[18px]">arrow_forward</mat-icon>
+    </button>
+  </div>
+
+</div>
+

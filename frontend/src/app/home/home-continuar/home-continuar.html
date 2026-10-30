@@ -1,0 +1,52 @@
+@if (continuarEstudando(); as estudo) {
+<div class="bg-surface border border-border rounded-2xl p-6">
+  <div class="flex items-start justify-between">
+    <div>
+      <p class="text-sm font-medium text-math">
+        {{ getUltimaMateria() }}
+      </p>
+
+      <h2 class="mt-2 text-xl font-bold text-foreground">
+        {{ getUltimaAula() }}
+      </h2>
+
+      <p class="mt-1 text-sm text-foreground-secondary">
+        Último estudo: {{ getUltimoAcessoFormatado() }}
+      </p>
+    </div>
+
+    <span class="px-3 py-1
+        rounded-full
+        text-xs font-medium">
+      {{ getProgresso() }}%
+    </span>
+  </div>
+
+  <div class="mt-5 h-2 bg-success-light rounded-full overflow-hidden">
+    <div
+      class="h-full rounded-full bg-success"
+      [style.width.%]="getProgresso()">
+    </div>
+  </div>
+
+  <div class="mt-6">
+    <a
+      [routerLink]="['/aula', estudo.aulaId]"
+      class="inline-flex rounded-xl bg-primary px-5 py-2.5 font-medium text-white transition hover:bg-primary-hover">
+      Continuar estudando
+    </a>
+  </div>
+</div>
+} @else {
+  <div class="bg-surface border border-border rounded-2xl p-6">
+    <h2 class="text-lg font-bold text-foreground">Comece sua jornada</h2>
+    <p class="mt-2 text-sm text-foreground-secondary">
+      Escolha uma aula para iniciar seus estudos de Matemática.
+    </p>
+    <a
+      routerLink="/aulas"
+      class="mt-5 inline-flex rounded-xl bg-primary px-5 py-2.5 font-medium text-white transition hover:bg-primary-hover">
+      Ver aulas
+    </a>
+  </div>
+}

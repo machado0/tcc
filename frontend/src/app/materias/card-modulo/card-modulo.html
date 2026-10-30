@@ -1,0 +1,139 @@
+<div 
+  class="bg-surface border rounded-2xl p-6 transition-all"
+  [class.border-border]="modulo().status !== 'BLOQUEADA'"
+  [class.border-border-strong]="modulo().status === 'BLOQUEADA'"
+  [class.border-dashed]="modulo().status === 'BLOQUEADA'"
+  [class.opacity-75]="modulo().status === 'BLOQUEADA'">
+  
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border">
+    <div>
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-xs font-bold uppercase tracking-wider text-primary">
+          Módulo {{ modulo().ordem }}
+        </span>
+
+        @if (modulo().status === 'CONCLUIDA') {
+          <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-success-light text-success border border-success/20">
+            <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">check_circle</mat-icon>
+            Concluído
+          </span>
+        } @else if (modulo().status === 'DISPONIVEL') {
+          <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary-light text-primary border border-primary/20">
+            <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">play_circle</mat-icon>
+            Em andamento
+          </span>
+        } @else {
+          <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-border text-foreground-muted">
+            <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">lock</mat-icon>
+            Bloqueado
+          </span>
+        }
+      </div>
+
+      <h3 class="text-lg font-bold text-foreground">
+        {{ modulo().titulo }}
+      </h3>
+      <p class="text-xs text-foreground-secondary mt-0.5">
+        {{ modulo().descricao }}
+      </p>
+    </div>
+
+    @if (modulo().status === 'DISPONIVEL') {
+      <div class="sm:w-44 shrink-0">
+        <div class="flex justify-between items-center text-xs text-foreground-secondary mb-1">
+          <span>Progresso</span>
+          <span class="font-semibold text-foreground">{{ modulo().progressoPorcentagem }}%</span>
+        </div>
+        <div class="h-2 w-full bg-surface-2 rounded-full overflow-hidden border border-border">
+          <div 
+            class="h-full bg-primary rounded-full transition-all duration-300"
+            [style.width.%]="modulo().progressoPorcentagem">
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- aulas do modulo -->
+  <div class="space-y-3 mt-4">
+    @for (aula of modulo().aulas; track aula.id) {
+      <div 
+        class="p-3.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors"
+        [class.bg-surface-2]="aula.status === 'BLOQUEADA'"
+        [class.border-border]="aula.status !== 'BLOQUEADA'"
+        [class.border-border-strong]="aula.status === 'BLOQUEADA'"
+        [class.border-dashed]="aula.status === 'BLOQUEADA'"
+        [class.bg-surface]="aula.status !== 'BLOQUEADA'">
+        
+        <div class="flex items-start gap-3.5 min-w-0">
+          <div 
+            class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-bold text-xs"
+            [class.bg-success-light]="aula.status === 'CONCLUIDA'"
+            [class.text-success]="aula.status === 'CONCLUIDA'"
+            [class.bg-primary-light]="aula.status === 'DISPONIVEL'"
+            [class.text-primary]="aula.status === 'DISPONIVEL'"
+            [class.bg-border]="aula.status === 'BLOQUEADA'"
+            [class.text-foreground-muted]="aula.status === 'BLOQUEADA'">
+            @if (aula.status === 'CONCLUIDA') {
+              <mat-icon class="!w-5 !h-5 !text-[20px]">check</mat-icon>
+            } @else if (aula.status === 'DISPONIVEL') {
+              <mat-icon class="!w-5 !h-5 !text-[20px]">play_arrow</mat-icon>
+            } @else {
+              <mat-icon class="!w-4 !h-4 !text-[16px]">lock</mat-icon>
+            }
+          </div>
+
+          <div class="min-w-0">
+            <h4 class="font-semibold text-sm text-foreground truncate">
+              {{ aula.ordem }}. {{ aula.titulo }}
+            </h4>
+            @if (aula.descricao) {
+              <p class="text-xs text-foreground-secondary line-clamp-1 mt-0.5">
+                {{ aula.descricao }}
+              </p>
+            }
+            <div class="flex items-center gap-3 mt-1 text-[11px] text-foreground-muted font-medium">
+              <span class="flex items-center gap-1">
+                <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">schedule</mat-icon>
+                {{ aula.duracaoMinutos }} min
+              </span>
+              <span class="flex items-center gap-1 text-secondary font-semibold">
+                <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">bolt</mat-icon>
+                +{{ aula.xpRecompensa }} XP
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="shrink-0 self-end sm:self-center">
+          @if (aula.status === 'CONCLUIDA') {
+            <a 
+              [routerLink]="['/aula', aula.id]"
+              class="px-3.5 py-1.5 rounded-xl border border-border text-foreground-secondary hover:bg-surface-2 text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition">
+              <mat-icon class="!w-4 !h-4 !text-[16px]">replay</mat-icon>
+              Revisar
+            </a>
+          } @else if (aula.status === 'DISPONIVEL') {
+            <a 
+              [routerLink]="['/aula', aula.id]"
+              class="px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-hover text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm transition">
+              Iniciar
+              <mat-icon class="!w-4 !h-4 !text-[16px]">arrow_forward</mat-icon>
+            </a>
+          } @else {
+            <button 
+              type="button"
+              disabled
+              class="px-3 py-1.5 rounded-xl bg-border/50 text-foreground-muted text-xs font-medium flex items-center gap-1 cursor-not-allowed">
+              <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">lock</mat-icon>
+              Bloqueada
+            </button>
+          }
+        </div>
+
+      </div>
+    }
+  </div>
+
+</div>
+

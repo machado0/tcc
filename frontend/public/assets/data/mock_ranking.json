@@ -1,0 +1,131 @@
+{
+  "id": 1,
+  "nomeTurma": "3º Ano B - Ensino Médio",
+  "periodo": "Semana 43 • 2026",
+  "terminaEmDias": 3,
+  "totalAlunos": 10,
+  "posicaoUsuarioLogado": 4,
+  "alunos": [
+    {
+      "posicao": 1,
+      "usuarioId": 101,
+      "nome": "Lucas Santos",
+      "username": "@lucas.santos",
+      "nivel": 15,
+      "xpSemana": 1840,
+      "sequenciaDias": 14,
+      "tendencia": "MANTEVE",
+      "variacaoPosicoes": 0,
+      "ehUsuarioLogado": false
+    },
+    {
+      "posicao": 2,
+      "usuarioId": 102,
+      "nome": "Beatriz Lima",
+      "username": "@bia.lima",
+      "nivel": 13,
+      "xpSemana": 1620,
+      "sequenciaDias": 9,
+      "tendencia": "SUBIU",
+      "variacaoPosicoes": 1,
+      "ehUsuarioLogado": false
+    },
+    {
+      "posicao": 3,
+      "usuarioId": 103,
+      "nome": "Mariana Costa",
+      "username": "@mari.costa",
+      "nivel": 12,
+      "xpSemana": 1510,
+      "sequenciaDias": 8,
+      "tendencia": "DESCEU",
+      "variacaoPosicoes": 1,
+      "ehUsuarioLogado": false
+    },
+    {
+      "posicao": 4,
+      "usuarioId": 1,
+      "nome": "João Silva",
+      "username": "@joaosilva",
+      "nivel": 12,
+      "xpSemana": 1420,
+      "sequenciaDias": 7,
+      "tendencia": "SUBIU",
+      "variacaoPosicoes": 2,
+      "ehUsuarioLogado": true
+    },
+    {
+      "posicao": 5,
+      "usuarioId": 104,
+      "nome": "Gabriel Oliveira",
+      "username": "@gabi.oliveira",
+      "nivel": 11,
+      "xpSemana": 1290,
+      "sequenciaDias": 5,
+      "tendencia": "MANTEVE",
+      "variacaoPosicoes": 0,
+      "ehUsuarioLogado": false
+    },
+    {
+      "posicao": 6,
+      "usuarioId": 105,
+      "nome": "Larissa Souza",
+      "username": "@lari.souza",
+      "nivel": 10,
+      "xpSemana": 1150,
+      "sequenciaDias": 4,
+      "tendencia": "DESCEU",
+      "variacaoPosicoes": 2,
+      "ehUsuarioLogado": false
+    },
+    {
+      "posicao": 7,
+      "usuarioId": 106,
+      "nome": "Rafael Ferreira",
+      "username": "@rafa.ferreira",
+      "nivel": 9,
+      "xpSemana": 980,
+      "sequenciaDias": 6,
+      "tendencia": "SUBIU",
+      "variacaoPosicoes": 1,
+      "ehUsuarioLogado": false
+    },
+    {
+      "posicao": 8,
+      "usuarioId": 107,
+      "nome": "Camila Alves",
+      "username": "@camila.alves",
+      "nivel": 8,
+      "xpSemana": 850,
+      "sequenciaDias": 3,
+      "tendencia": "MANTEVE",
+      "variacaoPosicoes": 0,
+      "ehUsuarioLogado": false
+    },
+    {
+      "posicao": 9,
+      "usuarioId": 108,
+      "nome": "Matheus Rocha",
+      "username": "@matheus.rocha",
+      "nivel": 8,
+      "xpSemana": 720,
+      "sequenciaDias": 2,
+      "tendencia": "DESCEU",
+      "variacaoPosicoes": 1,
+      "ehUsuarioLogado": false
+    },
+    {
+      "posicao": 10,
+      "usuarioId": 109,
+      "nome": "Juliana Mendes",
+      "username": "@ju.mendes",
+      "nivel": 7,
+      "xpSemana": 590,
+      "sequenciaDias": 1,
+      "tendencia": "MANTEVE",
+      "variacaoPosicoes": 0,
+      "ehUsuarioLogado": false
+    }
+  ]
+}
+

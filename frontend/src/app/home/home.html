@@ -1,0 +1,42 @@
+<div class="mx-auto w-full max-w-7xl py-6">
+  @if (carregando()) {
+    <div class="flex min-h-64 flex-col items-center justify-center gap-3 text-foreground-secondary">
+      <p class="text-sm font-medium">Carregando seu progresso...</p>
+    </div>
+  } @else if (erro()) {
+    <section class="mx-auto max-w-lg rounded-2xl border border-danger/20 bg-danger-light p-6 text-center text-danger">
+      <h1 class="font-semibold">Não foi possível carregar sua jornada</h1>
+      <p class="mt-2 text-sm">{{ erro() }}</p>
+
+      <button
+        type="button"
+        class="mt-4 rounded-xl bg-danger px-4 py-2 text-sm font-medium text-white"
+        (click)="carregarDadosHome()">
+        Tentar novamente
+      </button>
+    </section>
+  } @else if (dados(); as dadosHome) {
+    <section>
+      <app-saudacao class="block" [usuario]="dadosHome.usuario" />
+    </section>
+
+    <div class="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+      <section class="space-y-6 lg:col-span-2">
+        <app-home-progresso class="block min-w-0" [estatisticas]="dadosHome.estatisticas" />
+        <app-home-continuar class="block min-w-0" [continuarEstudando]="dadosHome.continuarEstudando" />
+      </section>
+
+      <section>
+        <app-card-missoes-diarias
+          class="block min-w-0"
+          [missoes]="dadosHome.missoesDiarias" />
+      </section>
+    </div>
+
+    <section class="mt-6">
+      <app-card-progresso-semanal
+        class="block min-w-0"
+        [progresso]="dadosHome.progressoSemanal" />
+    </section>
+  }
+</div>

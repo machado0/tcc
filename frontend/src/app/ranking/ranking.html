@@ -1,0 +1,57 @@
+<div class="py-6 space-y-6 max-w-7xl mx-auto w-full">
+
+  @if (carregando()) {
+    <div class="flex flex-col items-center justify-center py-24 text-foreground-secondary gap-3">
+      <mat-icon class="animate-spin text-primary !w-8 !h-8 !text-[32px]">progress_activity</mat-icon>
+      <p class="text-sm font-medium">Carregando classificação da turma...</p>
+    </div>
+  } @else if (erro()) {
+    <div class="p-6 rounded-2xl bg-danger-light border border-danger/20 text-danger text-center max-w-lg mx-auto">
+      <mat-icon class="!w-8 !h-8 !text-[32px] mb-2">error_outline</mat-icon>
+      <p class="font-semibold">{{ erro() }}</p>
+      <button 
+        type="button"
+        (click)="carregarRanking()"
+        class="mt-4 px-4 py-2 rounded-xl bg-danger text-white text-sm font-medium hover:opacity-90 cursor-pointer">
+        Tentar novamente
+      </button>
+    </div>
+  } @else if (turma(); as t) {
+    <!-- cabecalho -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-foreground">
+          Ranking da Turma
+        </h1>
+        <p class="mt-1 text-sm text-foreground-secondary">
+          {{ t.nomeTurma }} • {{ t.periodo }}
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 self-start sm:self-auto">
+        <span class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-surface border border-border text-foreground-secondary flex items-center gap-1.5 shadow-sm">
+          <mat-icon class="!w-4 !h-4 !text-[16px] text-warning">schedule</mat-icon>
+          Encerra em {{ t.terminaEmDias }} dias
+        </span>
+      </div>
+    </div>
+
+    <!-- podio -->
+    <section>
+      <app-ranking-podio [alunos]="t.alunos" />
+    </section>
+
+    <!-- tabela de classificacao e resumo -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <section class="lg:col-span-2">
+        <app-ranking-tabela [alunos]="t.alunos" />
+      </section>
+
+      <section class="lg:col-span-1">
+        <app-ranking-resumo-usuario [turma]="t" />
+      </section>
+    </div>
+  }
+
+</div>
+

@@ -1,0 +1,163 @@
+@if (sessaoFinalizada()) {
+  <!-- resumo conclusao -->
+  <div class="bg-surface border border-border rounded-2xl p-8 text-center max-w-xl mx-auto space-y-6">
+    <div class="w-16 h-16 rounded-2xl bg-success-light text-success mx-auto flex items-center justify-center">
+      <mat-icon class="!w-9 !h-9 !text-[36px]">emoji_events</mat-icon>
+    </div>
+
+    <div>
+      <h2 class="text-2xl font-bold text-foreground">
+        Exercícios Concluídos!
+      </h2>
+      <p class="text-sm text-foreground-secondary mt-1">
+        Você finalizou as questões propostas para esta aula.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 p-4 rounded-xl bg-surface-2 border border-border">
+      <div>
+        <span class="text-xs text-foreground-secondary">Acertos</span>
+        <p class="text-2xl font-bold text-foreground mt-0.5">
+          {{ acertos() }} / {{ questoes().length }}
+        </p>
+      </div>
+      <div>
+        <span class="text-xs text-foreground-secondary">XP Conquistado</span>
+        <p class="text-2xl font-bold text-secondary mt-0.5">
+          +{{ xpGanhoTotal() }} XP
+        </p>
+      </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+      <button
+        type="button"
+        (click)="reiniciar()"
+        class="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-border text-foreground-secondary hover:bg-surface-2 text-xs font-semibold cursor-pointer transition">
+        Refazer Questões
+      </button>
+
+      <a
+        routerLink="/aulas"
+        class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-primary text-white hover:bg-primary-hover text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-sm transition">
+        Voltar para a Trilha
+        <mat-icon class="!w-4 !h-4 !text-[16px]">arrow_forward</mat-icon>
+      </a>
+    </div>
+  </div>
+} @else if (questaoAtual(); as questao) {
+  <div class="bg-surface border border-border rounded-2xl p-6 sm:p-8 space-y-6">
+    
+    <!-- barra de progresso -->
+    <div class="flex items-center justify-between pb-4 border-b border-border text-xs text-foreground-secondary font-medium">
+      <span class="flex items-center gap-1.5 font-bold text-foreground">
+        <mat-icon class="text-primary !w-4 !h-4 !text-[16px]">quiz</mat-icon>
+        Questão {{ indiceAtual() + 1 }} de {{ questoes().length }}
+      </span>
+
+      @if (questao.contextoEscolar) {
+        <span class="px-2.5 py-0.5 rounded-full bg-surface-2 border border-border text-[11px] font-semibold text-foreground-secondary">
+          {{ questao.contextoEscolar }}
+        </span>
+      }
+    </div>
+
+    <!-- enunciado -->
+    <div>
+      <p class="text-base sm:text-lg font-medium text-foreground leading-relaxed">
+        {{ questao.enunciado }}
+      </p>
+    </div>
+
+    <!-- alternativas -->
+    <div class="space-y-3">
+      @for (opcao of questao.opcoes; track opcao.id) {
+        <button
+          type="button"
+          (click)="selecionarOpcao(opcao)"
+          [disabled]="respostaConfirmada()"
+          [class.border-primary]="!respostaConfirmada() && opcaoSelecionadaId() === opcao.id"
+          [class.bg-primary-light\/20]="!respostaConfirmada() && opcaoSelecionadaId() === opcao.id"
+          [class.border-success]="respostaConfirmada() && opcao.id === questao.opcaoCorretaId"
+          [class.bg-success-light]="respostaConfirmada() && opcao.id === questao.opcaoCorretaId"
+          [class.border-danger]="respostaConfirmada() && opcaoSelecionadaId() === opcao.id && opcao.id !== questao.opcaoCorretaId"
+          [class.bg-danger-light]="respostaConfirmada() && opcaoSelecionadaId() === opcao.id && opcao.id !== questao.opcaoCorretaId"
+          [class.border-border]="!respostaConfirmada() && opcaoSelecionadaId() !== opcao.id"
+          [class.bg-surface]="!respostaConfirmada() && opcaoSelecionadaId() !== opcao.id"
+          [class.cursor-pointer]="!respostaConfirmada()"
+          class="w-full text-left p-4 rounded-xl border transition-all flex items-start gap-3.5">
+          
+          <span 
+            class="w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs shrink-0"
+            [class.bg-primary]="!respostaConfirmada() && opcaoSelecionadaId() === opcao.id"
+            [class.text-white]="!respostaConfirmada() && opcaoSelecionadaId() === opcao.id"
+            [class.bg-success]="respostaConfirmada() && opcao.id === questao.opcaoCorretaId"
+            [class.text-white]="respostaConfirmada() && opcao.id === questao.opcaoCorretaId"
+            [class.bg-danger]="respostaConfirmada() && opcaoSelecionadaId() === opcao.id && opcao.id !== questao.opcaoCorretaId"
+            [class.text-white]="respostaConfirmada() && opcaoSelecionadaId() === opcao.id && opcao.id !== questao.opcaoCorretaId"
+            [class.bg-surface-2]="opcaoSelecionadaId() !== opcao.id"
+            [class.text-foreground-secondary]="opcaoSelecionadaId() !== opcao.id">
+            {{ opcao.letra }}
+          </span>
+
+          <span class="text-sm text-foreground pt-0.5 leading-relaxed">
+            {{ opcao.texto }}
+          </span>
+        </button>
+      }
+    </div>
+
+    <!-- feedback dps da resposta -->
+    @if (respostaConfirmada()) {
+      <div 
+        class="p-4 rounded-xl border text-xs sm:text-sm space-y-1.5"
+        [class.bg-success-light\/60]="acertouResposta()"
+        [class.border-success\/30]="acertouResposta()"
+        [class.text-success-strong]="acertouResposta()"
+        [class.bg-danger-light\/60]="!acertouResposta()"
+        [class.border-danger\/30]="!acertouResposta()"
+        [class.text-danger-strong]="!acertouResposta()">
+        
+        <div class="flex items-center gap-2 font-bold text-sm">
+          @if (acertouResposta()) {
+            <mat-icon class="!w-5 !h-5 !text-[20px] text-success">check_circle</mat-icon>
+            <span class="text-success">Resposta Correta! (+{{ questao.xpRecompensa }} XP)</span>
+          } @else {
+            <mat-icon class="!w-5 !h-5 !text-[20px] text-danger">cancel</mat-icon>
+            <span class="text-danger">Resposta Incorreta</span>
+          }
+        </div>
+
+        <p class="text-foreground-secondary leading-relaxed pl-7">
+          {{ questao.explicacaoPedagogica }}
+        </p>
+      </div>
+    }
+
+    <!-- verificacao e proxima -->
+    <div class="flex justify-end pt-2">
+      @if (!respostaConfirmada()) {
+        <button
+          type="button"
+          (click)="verificarResposta()"
+          [disabled]="opcaoSelecionadaId() === null"
+          [class.opacity-50]="opcaoSelecionadaId() === null"
+          [class.cursor-not-allowed]="opcaoSelecionadaId() === null"
+          [class.cursor-pointer]="opcaoSelecionadaId() !== null"
+          class="px-6 py-3 rounded-xl bg-primary text-white hover:bg-primary-hover font-bold text-sm shadow-sm transition">
+          Verificar Resposta
+        </button>
+      } @else {
+        <button
+          type="button"
+          (click)="avancar()"
+          class="px-6 py-3 rounded-xl bg-primary text-white hover:bg-primary-hover font-bold text-sm flex items-center gap-2 cursor-pointer shadow-sm transition">
+          {{ ehUltimaQuestao() ? 'Finalizar Aula' : 'Próxima Questão' }}
+          <mat-icon class="!w-4 !h-4 !text-[18px]">arrow_forward</mat-icon>
+        </button>
+      }
+    </div>
+
+  </div>
+}
+

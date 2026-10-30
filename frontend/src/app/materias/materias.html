@@ -1,0 +1,59 @@
+<div class="py-6 space-y-6 max-w-7xl mx-auto w-full">
+  
+  @if (carregando()) {
+    <div class="flex flex-col items-center justify-center py-24 text-foreground-secondary gap-3">
+      <mat-icon class="animate-spin text-primary !w-8 !h-8 !text-[32px]">progress_activity</mat-icon>
+      <p class="text-sm font-medium">Carregando mapa de matérias...</p>
+    </div>
+  } @else if (erro()) {
+    <div class="p-6 rounded-2xl bg-danger-light border border-danger/20 text-danger text-center max-w-lg mx-auto">
+      <mat-icon class="!w-8 !h-8 !text-[32px] mb-2">error_outline</mat-icon>
+      <p class="font-semibold">{{ erro() }}</p>
+      <button 
+        type="button"
+        (click)="carregarMaterias()"
+        class="mt-4 px-4 py-2 rounded-xl bg-danger text-white text-sm font-medium hover:opacity-90 cursor-pointer">
+        Tentar novamente
+      </button>
+    </div>
+  } @else if (materiaAtiva(); as materia) {
+    <!-- titulo -->
+    <div>
+      <h1 class="text-2xl font-bold text-foreground">
+        Aulas e Conteúdos
+      </h1>
+      <p class="mt-1 text-sm text-foreground-secondary">
+        Acompanhe sua evolução e avance pelas matérias e módulos.
+      </p>
+    </div>
+
+    <!-- seletor de materias -->
+    <section>
+      <app-seletor-materias 
+        [materias]="materias()"
+        [materiaSelecionada]="materia"
+        (selecionarMateria)="aoTrocarMateria($event)" />
+    </section>
+
+    <!-- trilha de modulos e resumo -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      
+      <section class="lg:col-span-2 space-y-5">
+        @for (modulo of materia.modulos; track modulo.id) {
+          <app-card-modulo [modulo]="modulo" />
+        } @empty {
+          <div class="p-8 rounded-2xl border border-dashed border-border text-center text-foreground-secondary text-sm">
+            Nenhum módulo cadastrado nesta matéria ainda.
+          </div>
+        }
+      </section>
+
+      <section class="lg:col-span-1">
+        <app-resumo-materia [materia]="materia" />
+      </section>
+
+    </div>
+  }
+
+</div>
+

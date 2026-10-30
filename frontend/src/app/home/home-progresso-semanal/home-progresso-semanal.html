@@ -1,0 +1,151 @@
+<section
+  class="bg-surface
+    border border-border
+    rounded-2xl
+    p-6">
+
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <h2 class="text-xl font-semibold text-foreground">
+        Seu progresso esta semana
+      </h2>
+
+      <p class="mt-1 text-sm text-foreground-secondary">
+        XP conquistado nesta semana
+      </p>
+    </div>
+
+    <div class="text-right">
+      <p class="text-xl font-bold text-xp">
+        +{{ progresso().totalXp }} XP
+      </p>
+
+      <p class="text-xs text-foreground-secondary">
+        esta semana
+      </p>
+    </div>
+  </div>
+
+  <!-- semanal -->
+  <div
+    class="
+      mt-8
+      h-48
+      flex
+      items-end
+      justify-between
+      gap-2
+      sm:h-56
+      sm:gap-4
+      lg:h-64
+    "
+  >
+    @for (
+      dia of progresso().dias;
+      track dia.data
+    ) {
+      <div
+        class="
+          flex-1
+          h-full
+          min-w-0
+          flex
+          flex-col
+          items-center
+          justify-end
+          gap-2
+        "
+      >
+        <span
+          class="
+            text-xs
+            font-medium
+            text-foreground-secondary
+          "
+        >
+          @if (dia.xp > 0) {
+            +{{ dia.xp }}
+          }
+          @else {
+            —
+          }
+        </span>
+
+        <div
+          class="
+            relative
+            w-full
+            max-w-12
+            flex-1
+            flex
+            items-end
+          "
+        >
+          <div
+            class="
+              w-full
+              bg-surface-2
+              rounded-t-xl
+              overflow-hidden
+              h-full
+              flex
+              items-end
+            "
+          >
+            <div
+              class="
+                w-full
+                bg-primary
+                rounded-t-xl
+                transition-all
+                duration-500
+              "
+              [style.height.%]="
+                calcularAlturaBarra(dia.xp)
+              "
+            ></div>
+          </div>
+        </div>
+
+        <span
+          class="
+            text-xs
+            font-semibold
+            text-foreground-secondary
+          "
+        >
+          {{ dia.dia }}
+        </span>
+      </div>
+    }
+  </div>
+
+  <div
+    class="
+      mt-6
+      pt-4
+      border-t border-border
+      flex
+      flex-col
+      items-start
+      justify-between
+      gap-4
+      sm:flex-row
+      sm:items-center
+    "
+  >
+    <span class="text-sm text-foreground-secondary">
+      🔥 {{ progresso().diasEstudados }} de 7 dias com XP ganho
+    </span>
+
+    <span class="text-sm font-medium text-foreground">
+      Média:
+      {{
+        (progresso().totalXp / 7)
+          | number: '1.0-0'
+      }}
+      XP/dia
+    </span>
+  </div>
+
+</section>

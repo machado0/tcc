@@ -1,0 +1,80 @@
+<div class="space-y-6">
+
+  <!-- desempenho aluno -->
+  @if (alunoLogado(); as logado) {
+    <div class="bg-surface border border-border rounded-2xl p-6">
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-xs font-bold uppercase tracking-wider text-primary">
+          Seu Desempenho
+        </span>
+        <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary-light text-primary">
+          Semana Atual
+        </span>
+      </div>
+
+      <div class="flex items-center gap-4 p-4 rounded-xl bg-surface-2 border border-border mb-4">
+        <div class="w-14 h-14 rounded-2xl bg-primary text-white flex flex-col items-center justify-center font-bold shadow-sm shrink-0">
+          <span class="text-xs font-normal opacity-80">Posição</span>
+          <span class="text-xl">#{{ logado.posicao }}</span>
+        </div>
+
+        <div>
+          <h3 class="font-bold text-foreground text-base">
+            {{ logado.nome }}
+          </h3>
+          <p class="text-xs text-secondary font-bold">
+            {{ logado.xpSemana }} XP acumulados
+          </p>
+        </div>
+      </div>
+
+      <!-- meta pra subir de posicao -->
+      @if (alunoAcima(); as acima) {
+        <div class="p-3.5 rounded-xl bg-primary-light/50 border border-primary/20 text-xs text-primary flex items-start gap-2.5">
+          <mat-icon class="!w-4 !h-4 !text-[16px] shrink-0 mt-0.5">trending_up</mat-icon>
+          <span>
+            Faltam apenas <strong>{{ xpParaProximaPosicao() }} XP</strong> para alcançar <strong>{{ acima.nome }}</strong> ({{ acima.posicao }}º lugar)!
+          </span>
+        </div>
+      } @else {
+        <div class="p-3.5 rounded-xl bg-success-light border border-success/20 text-xs text-success flex items-start gap-2.5">
+          <mat-icon class="!w-4 !h-4 !text-[16px] shrink-0 mt-0.5">emoji_events</mat-icon>
+          <span>
+            Parabéns! Você está na <strong>liderança da turma</strong> esta semana! Continue praticando para manter o 1º lugar.
+          </span>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- informacoes da rodada -->
+  <div class="bg-surface border border-border rounded-2xl p-6">
+    <h3 class="text-base font-bold text-foreground flex items-center gap-2 mb-4">
+      <mat-icon class="text-warning">timer</mat-icon>
+      Ciclo Semanal
+    </h3>
+
+    <div class="space-y-3.5 text-xs text-foreground-secondary">
+      <div class="flex items-center justify-between p-3 rounded-xl bg-surface-2 border border-border">
+        <span>Tempo Restante</span>
+        <span class="font-bold text-foreground">{{ turma().terminaEmDias }} dias</span>
+      </div>
+
+      <div class="flex items-start gap-2 pt-1">
+        <mat-icon class="!w-4 !h-4 !text-[16px] text-primary shrink-0 mt-0.5">info</mat-icon>
+        <p class="leading-relaxed">
+          Os <strong>Top 3</strong> colocados da turma ao final do ciclo ganham bônus de moedas e insígnias para o perfil.
+        </p>
+      </div>
+
+      <div class="flex items-start gap-2">
+        <mat-icon class="!w-4 !h-4 !text-[16px] text-foreground-muted shrink-0 mt-0.5">restart_alt</mat-icon>
+        <p class="leading-relaxed">
+          A pontuação semanal é reiniciada todo domingo às 23:59.
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>
+

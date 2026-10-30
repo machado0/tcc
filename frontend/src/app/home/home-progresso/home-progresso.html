@@ -1,0 +1,52 @@
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+  <div class="bg-surface border border-border rounded-2xl p-5">
+    <!-- lvl -->
+    <p class="text-sm text-foreground-secondary">
+      Nível
+    </p>
+
+    <p class="mt-2 text-3xl font-bold text-foreground">
+      {{ estatisticas().nivel }}
+    </p>
+
+    <div class="mt-4 h-2 bg-surface-2 rounded-full overflow-hidden">
+        <mat-progress-bar 
+            mode="determinate" 
+            [value]="progressoNivel">
+        </mat-progress-bar>
+    </div>
+    
+    <p class="mt-2 text-xs text-foreground-muted">
+      {{ estatisticas().xpAtual }} / {{ estatisticas().xpProximoNivel }} XP
+    </p>
+  </div>
+
+
+  <div class="bg-surface border border-border rounded-2xl p-5">
+    <!-- xp -->
+    <p class="text-sm text-foreground-secondary">
+        Experiência
+    </p>
+
+    <p class="mt-2 text-3xl font-bold text-foreground">
+        {{ estatisticas().xpAtual }} XP
+    </p>
+
+    <p class="mt-1 text-sm text-success">
+        + {{ estatisticas().xpHoje }} hoje
+    </p>
+  </div>
+
+
+  <div class="bg-surface border border-border rounded-2xl p-5">
+    <!-- sequencia -->
+    <p class="text-sm text-foreground-secondary">
+        Sequência
+    </p>
+
+    <p class="mt-2 text-3xl font-bold text-foreground">
+        {{ estatisticas().sequenciaDias }} dias
+    </p>
+  </div>
+</div>

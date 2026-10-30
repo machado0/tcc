@@ -1,0 +1,53 @@
+<div class="py-6 space-y-6 max-w-4xl mx-auto w-full">
+
+  @if (carregando()) {
+    <div class="flex flex-col items-center justify-center py-24 text-foreground-secondary gap-3">
+      <mat-icon class="animate-spin text-primary !w-8 !h-8 !text-[32px]">progress_activity</mat-icon>
+      <p class="text-sm font-medium">Carregando configurações escolares...</p>
+    </div>
+  } @else if (erro()) {
+    <div class="p-6 rounded-2xl bg-danger-light border border-danger/20 text-danger text-center max-w-lg mx-auto">
+      <mat-icon class="!w-8 !h-8 !text-[32px] mb-2">error_outline</mat-icon>
+      <p class="font-semibold">{{ erro() }}</p>
+      <button 
+        type="button"
+        (click)="carregarConfiguracoes()"
+        class="mt-4 px-4 py-2 rounded-xl bg-danger text-white text-sm font-medium hover:opacity-90 cursor-pointer">
+        Tentar novamente
+      </button>
+    </div>
+  } @else if (config(); as c) {
+    <!-- titulo -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-foreground">
+          Configurações
+        </h1>
+        <p class="mt-1 text-sm text-foreground-secondary">
+          Gerencie seu perfil de aluno, acessibilidade e avisos da plataforma.
+        </p>
+      </div>
+
+      @if (mensagemSalvo()) {
+        <div class="px-4 py-2 rounded-xl bg-success-light border border-success/20 text-success text-xs font-bold flex items-center gap-2 animate-fade-in shadow-sm">
+          <mat-icon class="!w-4 !h-4 !text-[16px]">check_circle</mat-icon>
+          {{ mensagemSalvo() }}
+        </div>
+      }
+    </div>
+
+    <!-- vinculo escolar -->
+    <section>
+      <app-config-perfil-escolar [config]="c" />
+    </section>
+
+    <!-- preferencias e acessibilidade -->
+    <section>
+      <app-config-preferencias 
+        [config]="c" 
+        (salvarPreferencias)="aoSalvar($event)" />
+    </section>
+  }
+
+</div>
+

@@ -1,0 +1,155 @@
+<div class="mx-auto w-full max-w-7xl py-6">
+  @if (carregando()) {
+    <div class="flex min-h-64 flex-col items-center justify-center gap-3 text-foreground-secondary">
+      <mat-icon class="animate-spin">progress_activity</mat-icon>
+      <p class="text-sm font-medium">Carregando seus desafios...</p>
+    </div>
+  } @else if (erro()) {
+    <section class="mx-auto max-w-lg rounded-2xl border border-danger/20 bg-danger-light p-6 text-center text-danger">
+      <h1 class="font-semibold">Não foi possível carregar os desafios</h1>
+      <p class="mt-2 text-sm">{{ erro() }}</p>
+      <button
+        type="button"
+        class="mt-4 rounded-xl bg-danger px-4 py-2 text-sm font-medium text-white"
+        (click)="carregar()">
+        Tentar novamente
+      </button>
+    </section>
+  } @else if (estado(); as dados) {
+    <header>
+      <p class="text-sm font-semibold uppercase tracking-wide text-primary">
+        Sua jornada
+      </p>
+      <h1 class="mt-1 text-2xl font-bold text-foreground">Desafios</h1>
+      <p class="mt-1 text-sm text-foreground-secondary">
+        Transforme pequenas atividades em progresso todos os dias.
+      </p>
+    </header>
+
+    <div class="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+      <section class="space-y-6 lg:col-span-2">
+        <div class="rounded-2xl border border-border bg-surface p-6">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 class="text-xl font-semibold text-foreground">Missões de hoje</h2>
+              <p class="mt-1 text-sm text-foreground-secondary">
+                Complete atividades para ganhar XP extra.
+              </p>
+            </div>
+            <span class="rounded-full bg-primary-light px-3 py-1 text-xs font-semibold text-primary">
+              {{ dados.missoes.length }} missões
+            </span>
+          </div>
+
+          <div class="mt-5 grid gap-3">
+            @for (missao of dados.missoes; track missao.id) {
+              <article class="rounded-xl border border-border p-4">
+                <div class="flex items-start gap-3">
+                  <div
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+                    [class.bg-success-light]="missao.concluida"
+                    [class.text-success]="missao.concluida"
+                    [class.bg-surface-2]="!missao.concluida"
+                    [class.text-foreground-secondary]="!missao.concluida">
+                    <mat-icon>{{ missao.concluida ? 'check' : 'flag' }}</mat-icon>
+                  </div>
+
+                  <div class="min-w-0 flex-1">
+                    <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                      <h3 class="font-medium text-foreground">{{ missao.titulo }}</h3>
+                      <span class="text-sm font-semibold text-xp">+{{ missao.xp }} XP</span>
+                    </div>
+                    <div class="mt-3 h-2 overflow-hidden rounded-full bg-surface-2">
+                      <div
+                        class="h-full rounded-full bg-primary transition-all"
+                        [style.width.%]="percentualMissao(missao)"></div>
+                    </div>
+                    <p class="mt-2 text-xs text-foreground-secondary">
+                      {{ missao.progressoAtual }} de {{ missao.meta }}
+                      @if (missao.concluida) { concluída } @else { concluída(s) }
+                    </p>
+                  </div>
+                </div>
+              </article>
+            } @empty {
+              <p class="rounded-xl border border-dashed border-border p-6 text-center text-sm text-foreground-secondary">
+                Nenhuma missão disponível hoje.
+              </p>
+            }
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-border bg-surface p-6">
+          <h2 class="text-xl font-semibold text-foreground">Conquistas</h2>
+          <p class="mt-1 text-sm text-foreground-secondary">
+            Acompanhe o que falta para desbloquear cada marco.
+          </p>
+
+          <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            @for (conquista of dados.conquistas; track conquista.id) {
+              <article class="rounded-xl border border-border p-4">
+                <div class="flex items-start gap-3">
+                  <div
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+                    [class.bg-primary-light]="conquista.desbloqueada"
+                    [class.text-primary]="conquista.desbloqueada"
+                    [class.bg-surface-2]="!conquista.desbloqueada"
+                    [class.text-foreground-muted]="!conquista.desbloqueada">
+                    <mat-icon>{{ conquista.icone }}</mat-icon>
+                  </div>
+                  <div class="min-w-0">
+                    <h3 class="font-medium text-foreground">{{ conquista.titulo }}</h3>
+                    <p class="mt-1 text-xs text-foreground-secondary">{{ conquista.descricao }}</p>
+                    <p class="mt-3 text-xs font-semibold" [class.text-success]="conquista.desbloqueada" [class.text-foreground-secondary]="!conquista.desbloqueada">
+                      {{ conquista.progressoAtual }} / {{ conquista.meta }}
+                      @if (conquista.desbloqueada) { • desbloqueada }
+                    </p>
+                  </div>
+                </div>
+              </article>
+            } @empty {
+              <p class="col-span-full rounded-xl border border-dashed border-border p-6 text-center text-sm text-foreground-secondary">
+                Nenhuma conquista cadastrada.
+              </p>
+            }
+          </div>
+        </div>
+      </section>
+
+      <aside class="space-y-6">
+        <section class="rounded-2xl border border-border bg-surface p-6">
+          <p class="text-sm text-foreground-secondary">Seu desempenho</p>
+          <p class="mt-2 text-3xl font-bold text-foreground">{{ dados.estatisticas.xpAtual }} XP</p>
+          <p class="mt-1 text-sm text-success">+{{ dados.estatisticas.xpHoje }} hoje</p>
+
+          <div class="mt-5 grid grid-cols-2 gap-3">
+            <div class="rounded-xl bg-surface-2 p-3">
+              <p class="text-xs text-foreground-secondary">Nível</p>
+              <p class="mt-1 text-lg font-bold text-foreground">{{ dados.estatisticas.nivel }}</p>
+            </div>
+            <div class="rounded-xl bg-surface-2 p-3">
+              <p class="text-xs text-foreground-secondary">Sequência</p>
+              <p class="mt-1 text-lg font-bold text-foreground">{{ dados.estatisticas.sequenciaDias }} dias</p>
+            </div>
+          </div>
+        </section>
+
+        @if (dados.rankingUsuario; as ranking) {
+          <section class="rounded-2xl border border-border bg-surface p-6">
+            <p class="text-sm text-foreground-secondary">Ranking da turma</p>
+            <div class="mt-3 flex items-end justify-between gap-4">
+              <div>
+                <p class="text-3xl font-bold text-foreground">#{{ ranking.posicao }}</p>
+                <p class="mt-1 text-sm text-foreground-secondary">posição atual</p>
+              </div>
+              <div class="text-right">
+                <p class="text-xl font-bold text-xp">{{ ranking.xpSemana }} XP</p>
+                <p class="text-xs text-foreground-secondary">nesta semana</p>
+              </div>
+            </div>
+          </section>
+        }
+      </aside>
+    </div>
+  }
+</div>

@@ -1,0 +1,27 @@
+<main class="flex min-h-[calc(100vh-5rem)] items-center justify-center px-4 py-12">
+  <section class="w-full max-w-lg rounded-2xl border border-danger/20 bg-surface p-8 text-center shadow-sm">
+    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-danger-light text-danger">
+      <mat-icon class="!h-8 !w-8 !text-[32px]">cloud_off</mat-icon>
+    </div>
+
+    <p class="mt-6 text-sm font-semibold uppercase tracking-wide text-danger">Conexão indisponível</p>
+    <h1 class="mt-2 text-2xl font-bold text-foreground">Não foi possível conectar</h1>
+    <p class="mt-3 text-sm text-foreground-secondary">
+      Verifique sua conexão ou tente novamente em alguns instantes.
+    </p>
+
+    <div class="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+      <button
+        type="button"
+        class="rounded-xl bg-danger px-5 py-3 font-medium text-white transition hover:opacity-90"
+        (click)="recarregar()">
+        Tentar novamente
+      </button>
+      <a
+        routerLink="/home"
+        class="rounded-xl border border-border px-5 py-3 font-medium text-foreground transition hover:bg-surface-2">
+        Voltar para a Home
+      </a>
+    </div>
+  </section>
+</main>

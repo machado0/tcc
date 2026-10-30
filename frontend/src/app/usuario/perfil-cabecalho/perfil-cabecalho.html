@@ -1,0 +1,65 @@
+<div class="bg-surface border border-border rounded-2xl p-6 sm:p-8">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    
+    <div class="flex items-center gap-5">
+      <div class="relative">
+        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-primary text-white font-bold text-3xl sm:text-4xl flex items-center justify-center shadow-sm">
+          {{ inicialNome() }}
+        </div>
+        <span class="absolute -bottom-2 -right-2 px-2.5 py-0.5 rounded-full text-xs font-bold bg-secondary text-white shadow-sm flex items-center gap-1">
+          <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">star</mat-icon>
+          Nv. {{ estatisticas().nivel }}
+        </span>
+      </div>
+
+      <div class="space-y-1">
+        <div class="flex flex-wrap items-center gap-2">
+          <h1 class="text-2xl sm:text-3xl font-bold text-foreground">
+            {{ usuario().nome }}
+          </h1>
+          @if (usuario().tituloHonra) {
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-light text-primary border border-primary/20">
+              {{ usuario().tituloHonra }}
+            </span>
+          }
+        </div>
+
+        <p class="text-sm text-foreground-secondary">
+          {{ usuario().username ?? '@estudante' }} • Membro desde {{ usuario().dataCriacao ?? '2026' }}
+        </p>
+
+        @if (usuario().email) {
+          <p class="text-xs text-foreground-muted flex items-center gap-1 pt-0.5">
+            <mat-icon class="!w-4 !h-4 !text-[16px]">mail</mat-icon>
+            {{ usuario().email }}
+          </p>
+        }
+      </div>
+    </div>
+
+    <!-- barra xp do nivel -->
+    <div class="w-full md:w-80 bg-surface-2 border border-border rounded-xl p-4">
+      <div class="flex justify-between items-center text-sm font-medium mb-2">
+        <span class="text-foreground flex items-center gap-1.5">
+          <mat-icon class="!w-4 !h-4 !text-[16px] text-secondary">military_tech</mat-icon>
+          Nível {{ estatisticas().nivel }}
+        </span>
+        <span class="text-foreground-secondary text-xs">
+          {{ estatisticas().xpAtual }} / {{ estatisticas().xpProximoNivel }} XP
+        </span>
+      </div>
+
+      <div class="h-2.5 w-full bg-border rounded-full overflow-hidden">
+        <div 
+          class="h-full bg-secondary transition-all duration-300 rounded-full"
+          [style.width.%]="porcentagemNivel()">
+        </div>
+      </div>
+
+      <p class="text-xs text-foreground-muted text-right mt-1.5">
+        Faltam {{ estatisticas().xpProximoNivel - estatisticas().xpAtual }} XP para o Nível {{ estatisticas().nivel + 1 }}
+      </p>
+    </div>
+
+  </div>
+</div>

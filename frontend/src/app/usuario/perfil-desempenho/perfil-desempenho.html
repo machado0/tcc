@@ -1,0 +1,58 @@
+<div class="bg-surface border border-border rounded-2xl p-6">
+  <div class="flex items-center justify-between mb-5">
+    <h2 class="text-lg font-bold text-foreground flex items-center gap-2">
+      <mat-icon class="text-primary">insights</mat-icon>
+      Desempenho Geral
+    </h2>
+    <span class="text-xs px-2.5 py-1 rounded-full bg-surface-2 text-foreground-secondary font-medium">
+      Histórico completo
+    </span>
+  </div>
+
+  <div class="space-y-4">
+    <div class="p-4 rounded-xl bg-surface-2 border border-border">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm text-foreground-secondary font-medium">Taxa de Precisão</span>
+        <span class="text-sm font-bold text-success">{{ metricas().taxaAcerto }}%</span>
+      </div>
+      <div class="h-2 w-full bg-border rounded-full overflow-hidden">
+        <div 
+          class="h-full bg-success rounded-full"
+          [style.width.%]="metricas().taxaAcerto">
+        </div>
+      </div>
+      <p class="text-xs text-foreground-muted mt-2">
+        {{ metricas().questoesCorretas }} acertos em {{ metricas().questoesRespondidas }} questões respondidas
+      </p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <div class="p-3.5 rounded-xl border border-border bg-surface flex flex-col justify-between">
+        <div class="flex items-center gap-2 text-foreground-secondary text-xs font-medium">
+          <mat-icon class="!w-4 !h-4 !text-[16px] text-primary">school</mat-icon>
+          Aulas Concluídas
+        </div>
+        <p class="text-xl font-bold text-foreground mt-2">
+          {{ metricas().aulasConcluidas }}
+        </p>
+      </div>
+
+      <div class="p-3.5 rounded-xl border border-border bg-surface flex flex-col justify-between">
+        <div class="flex items-center gap-2 text-foreground-secondary text-xs font-medium">
+          <mat-icon class="!w-4 !h-4 !text-[16px] text-warning">schedule</mat-icon>
+          Tempo Total
+        </div>
+        <p class="text-xl font-bold text-foreground mt-2">
+          {{ horasEstudadas() }}
+        </p>
+      </div>
+    </div>
+
+    <div class="p-3.5 rounded-xl bg-primary-light/50 border border-primary/20 text-xs text-primary flex items-start gap-2.5">
+      <mat-icon class="!w-4 !h-4 !text-[16px] shrink-0 mt-0.5">tips_and_updates</mat-icon>
+      <span>
+        Resolva mais <strong>8 questões</strong> hoje para desbloquear o bônus de consistência diária!
+      </span>
+    </div>
+  </div>
+</div>
